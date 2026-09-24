@@ -27,6 +27,16 @@ The current static preview is:
 node app/preview.mjs
 ```
 
+The native macOS/WebKit acceptance lane is built and run against a served URL with:
+
+```sh
+swift build --package-path acceptance/webkit
+acceptance/webkit/.build/arm64-apple-macosx/debug/TennisWebKitAcceptance --url http://127.0.0.1:8787/
+```
+
+It records DOM-semantic evidence and a fixed viewport snapshot in the selected output directory. It is not a
+deployment mechanism.
+
 This is development-only. Configure a real HTTPS deployment, server-side state, OAuth, and operational controls before using customer data.
 
 ## Privacy and ownership

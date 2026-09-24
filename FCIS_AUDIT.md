@@ -31,6 +31,8 @@ No unestablished item is claimed as complete by this audit.
   process-local and no production continuity claim is made for it.
 - Local SQLite recovery primitives now provide integrity-checked backup, restrictive permissions, retention, staged
   restore, and rollback snapshots. Encrypted off-host custody and HCloud operational evidence remain unestablished.
+- Native Swift/WebKit acceptance now builds and drives the served landing/app routes through DOM semantics and fixed
+  1280×800 snapshots. Authenticated post-login interaction and production deployment remain unestablished.
 
 ## Estate-derived controls now adopted
 

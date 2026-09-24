@@ -123,10 +123,25 @@ operations.
 Proof: integrity-checked backup/restore test, restrictive permission assertion, rollback read-back, retention test,
 full application contracts, syntax checks, privacy scan, diff check, semantic commit, and push to `main`.
 
-## Next bounded change — WebKit acceptance and service-release admission
+## Current bounded change — WebKit acceptance and service-release admission
 
 Capability: establish the native Swift/WebKit semantic acceptance lane and separately resolve the missing typed HCloud
 service-release adapter before any live deployment claim.
 
 The backup primitive must be bound to that future service operation with encrypted/off-host custody, retention policy,
 capacity/readiness evidence, and recovery receipts; local tests do not establish those operational witnesses.
+
+Implementation result: add a native macOS Swift/WebKit executable that loads a selected served URL, asserts main
+landmarks, customer-facing headings, planning navigation, and auth-gate presence through the DOM, then captures a
+fixed 1280×800 PNG plus JSON evidence. The executable is an acceptance witness only. No HCloud service-release
+adapter, SSH path, Caddy mutation, or live deployment claim was added.
+
+Proof: Swift package build, WebKit landing-route drive, WebKit `/app/` auth-gate drive, application contracts, syntax
+checks, privacy scan, diff check, semantic commit, and push to `main`.
+
+## Next bounded change — authenticated WebKit interaction matrix
+
+Capability: drive the admitted local OAuth session through WebKit, prove the authenticated dashboard semantics and one
+confirmed server-backed mutation, and bind the result to a reproducible local runtime.
+
+Live GitHub OAuth, ChatGPT authorization, HCloud identity, Caddy/TLS, and service-release remain separate witnesses.

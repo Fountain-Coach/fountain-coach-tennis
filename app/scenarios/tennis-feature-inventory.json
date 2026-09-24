@@ -34,7 +34,6 @@
   "deferred": [
     "roles-and-admin",
     "legacy-localStorage-migration",
-    "webkit-acceptance",
     "hcloud-service-release"
   ]
 }
