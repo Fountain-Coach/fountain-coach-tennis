@@ -11,6 +11,8 @@ the required legal review for the target jurisdiction.
 - Set `NODE_ENV=production`, a public HTTPS `OAUTH_ISSUER`, one configured OIDC provider, and a comma-separated
   `TENNIS_ADMIN_EMAILS` allowlist; GitHub, Google, and Apple are supported provider seams; never commit provider
   secrets or put them in browser code.
+- The native Tennis bridge is optional for a standalone SQLite deployment. Set `TENNIS_NATIVE_REQUIRED=1` only when
+  an explicitly configured native bridge is the selected production authority.
 - The MCP OAuth surface uses authorization-code + PKCE, dynamic client registration, explicit consent, `tennis.read`
   and `tennis.write` scopes, and refresh tokens. The static `MCP_BEARER_TOKEN` is an owner-only compatibility lane.
 - When `TENNIS_STATE_BACKEND=sqlite`, OAuth clients, grants, challenges, consent requests, access tokens, refresh

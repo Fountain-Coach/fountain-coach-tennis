@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -63,7 +63,7 @@ function plan() {
       edge: 'caddy',
       rollback: 'previous-atomic-release'
     },
-    mutation: 'disabled-until-explicit-release-adapter'
+    mutation: environment === 'production' ? 'typed-atomic-docker-caddy-release' : 'typed-staging-docker-release'
   };
 }
 
@@ -113,6 +113,11 @@ function deploy() {
     return;
   }
   const revision = git('rev-parse', 'HEAD');
+  if (environment === 'production') return deployProduction(p, revision);
+  return deployStaging(p, revision);
+}
+
+function deployStaging(p, revision) {
   const work = mkdtempSync(resolve(tmpdir(), 'tennis-release-'));
   const archive = resolve(work, `${revision}.tar.gz`);
   try {
@@ -138,6 +143,83 @@ function deploy() {
     console.log(result.trim());
   } catch (error) {
     console.error(`blocked: staging release failed: ${String(error.message || error).slice(0, 800)}`);
+    process.exitCode = 1;
+  } finally {
+    rmSync(work, { recursive: true, force: true });
+  }
+}
+
+function shellQuote(value) {
+  return `'${String(value).replaceAll("'", "'\\''")}'`;
+}
+
+function productionEnvironment() {
+  const values = {
+    NODE_ENV: 'production',
+    PORT: '8787',
+    BASE_URL: 'https://tennis.fountain.coach',
+    OAUTH_ISSUER: 'https://tennis.fountain.coach',
+    OAUTH_IDP: 'github',
+    GITHUB_OAUTH_CLIENT_ID: process.env.TENNIS_PRODUCTION_GITHUB_OAUTH_CLIENT_ID,
+    GITHUB_OAUTH_CLIENT_SECRET: process.env.TENNIS_PRODUCTION_GITHUB_OAUTH_CLIENT_SECRET,
+    GITHUB_OAUTH_REDIRECT_URI: 'https://tennis.fountain.coach/auth/github/callback',
+    TENNIS_ADMIN_EMAILS: process.env.TENNIS_PRODUCTION_ADMIN_EMAILS,
+    SESSION_SECRET: process.env.TENNIS_PRODUCTION_SESSION_SECRET,
+    TENNIS_STATE_BACKEND: 'sqlite',
+    TENNIS_SQLITE_FILE: '/var/lib/tennis/tennis.sqlite',
+    TENNIS_AUDIT_FILE: '/var/lib/tennis/audit.jsonl',
+    CORS_ORIGINS: 'https://tennis.fountain.coach'
+  };
+  const missing = Object.entries(values).filter(([, value]) => value === undefined || value === '').map(([key]) => key);
+  if (missing.length) throw new Error(`blocked: production configuration missing ${missing.join(', ')}`);
+  for (const [key, value] of Object.entries(values)) {
+    if (String(value).includes('\n') || String(value).includes('\r')) throw new Error(`blocked: production configuration contains a line break in ${key}`);
+  }
+  return Object.entries(values).map(([key, value]) => `${key}=${value}`).join('\n') + '\n';
+}
+
+function deployProduction(p, revision) {
+  const work = mkdtempSync(resolve(tmpdir(), 'tennis-production-release-'));
+  const archive = resolve(work, `${revision}.tar.gz`);
+  const envFile = resolve(work, 'tennis.env');
+  try {
+    const productionEnv = productionEnvironment();
+    writeFileSync(envFile, productionEnv, { mode: 0o600 });
+    chmodSync(envFile, 0o600);
+    execFileSync('git', ['-C', root, 'archive', '--format=tar.gz', '--output', archive, revision], { stdio: 'inherit' });
+    const remoteArchive = `/tmp/tennis-production-release-${revision}.tar.gz`;
+    const remoteEnv = `/tmp/tennis-production-env-${revision}`;
+    execFileSync('scp', ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', p.key,
+      archive, `${p.user}@${p.host}:${remoteArchive}`], { stdio: 'inherit' });
+    execFileSync('scp', ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', p.key,
+      envFile, `${p.user}@${p.host}:${remoteEnv}`], { stdio: 'inherit' });
+    const releaseRoot = '/opt/tennis';
+    const remote = [
+      'set -Eeuo pipefail',
+      'rollback() { code=$?; if [ "$code" -ne 0 ] && [ -n "${previous:-}" ] && [ -d "$previous" ]; then ln -sfn "$previous" /opt/tennis/active; docker compose -p tennis-production -f "$previous/deploy/compose.production.yml" up -d --build || true; fi; exit "$code"; }',
+      'trap rollback ERR',
+      'if ! command -v docker >/dev/null 2>&1; then apt-get update -qq; DEBIAN_FRONTEND=noninteractive apt-get install -y -qq docker.io docker-compose-v2 curl ca-certificates; systemctl enable --now docker; fi',
+      'docker compose version >/dev/null',
+      `mkdir -p ${shellQuote(`${releaseRoot}/releases`)} ${shellQuote(`${releaseRoot}/backups`)} /etc/tennis`,
+      `previous=$(readlink -f ${shellQuote(`${releaseRoot}/active`)} 2>/dev/null || true)`,
+      `release=${shellQuote(`${releaseRoot}/releases/${revision}`)}`,
+      'mkdir -p "$release"',
+      `tar -xzf ${shellQuote(remoteArchive)} -C "$release"`,
+      `install -m 600 ${shellQuote(remoteEnv)} /etc/tennis/tennis.env`,
+      `if docker volume inspect tennis-production-data >/dev/null 2>&1; then docker run --rm -v tennis-production-data:/var/lib/tennis -v ${shellQuote(`${releaseRoot}/backups`)}:/backups alpine:3.20 sh -c 'if [ -f /var/lib/tennis/tennis.sqlite ]; then cp /var/lib/tennis/tennis.sqlite /backups/tennis.sqlite.before-${revision}; fi'; fi`,
+      `ln -sfn "$release" ${shellQuote(`${releaseRoot}/active`)}`,
+      `docker compose -p tennis-production -f "$release/deploy/compose.production.yml" up -d --build`,
+      `docker compose -p tennis-production -f "$release/deploy/compose.production.yml" exec -T tennis-app node -e 'fetch("http://127.0.0.1:8787/healthz").then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))'`,
+      `curl --fail --silent --show-error --retry 30 --retry-all-errors --retry-delay 2 --location https://${p.hostname}/healthz >/dev/null`,
+      'trap - ERR',
+      `printf '{"schema":"fountain-coach.tennis.deploy-receipt.v2","state":"succeeded","environment":"production","revision":"${revision}","host":"${p.host}","hostname":"${p.hostname}","url":"https://${p.hostname}/","health":"https://${p.hostname}/healthz","release":"%s","rollback":"%s"}\n' "$release" "\${previous:-none}"`,
+      `rm -f ${shellQuote(remoteArchive)} ${shellQuote(remoteEnv)}`
+    ].join('; ');
+    const result = execFileSync('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', p.key,
+      `${p.user}@${p.host}`, remote], { encoding: 'utf8' });
+    console.log(result.trim());
+  } catch (error) {
+    console.error(`blocked: production release failed: ${String(error.message || error).replace(/(identity|secret|token|password|key)[^\n]*/gi, '$1=REDACTED').slice(0, 800)}`);
     process.exitCode = 1;
   } finally {
     rmSync(work, { recursive: true, force: true });

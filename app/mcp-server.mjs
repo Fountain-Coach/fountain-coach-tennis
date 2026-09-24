@@ -36,7 +36,7 @@ if (process.env.NODE_ENV === 'production' && !bearerToken && (!process.env.TENNI
 if (process.env.NODE_ENV === 'production' && process.env.TENNIS_ADMIN_EMAILS && !/^https:\/\//.test(String(process.env.OAUTH_ISSUER || ''))) {
   throw new Error('Production Tennis OAuth requires an HTTPS OAUTH_ISSUER.');
 }
-if (process.env.NODE_ENV === 'production' && (!nativeBridgeUrl || !nativeTenantId || !nativeUserId || !nativeBearerToken)) {
+if (process.env.NODE_ENV === 'production' && process.env.TENNIS_NATIVE_REQUIRED === '1' && (!nativeBridgeUrl || !nativeTenantId || !nativeUserId || !nativeBearerToken)) {
   throw new Error('Native Tennis bridge, tenant, user and bearer configuration are required in production.');
 }
 

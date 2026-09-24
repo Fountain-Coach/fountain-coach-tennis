@@ -54,6 +54,9 @@ variables:
 | `TENNIS_PRODUCTION_MCP_BEARER_TOKEN` | Optional owner-only compatibility lane |
 | `TENNIS_PRODUCTION_NATIVE_BEARER_TOKEN` | Optional native bridge credential |
 
+The live release adapter also consumes `TENNIS_PRODUCTION_GITHUB_OAUTH_CLIENT_ID`. The verified GitHub admin email is
+the protected Environment variable `TENNIS_PRODUCTION_ADMIN_EMAILS`; it is not embedded in the source release.
+
 Non-secret deployment values may be stored as Environment variables, for example the exact host, deploy user,
 hostname, and public OAuth callback URI. Keep the production environment separate from staging.
 
@@ -67,10 +70,10 @@ The customer does not need SSH knowledge. An authorized administrator selects `p
 deployment. The workflow runs the checked-in `tennis-deploy` CLI, which performs preflight, release, health/read-back,
 and rollback checks. The administrator sees a success or a clear blocked result, never the secret values.
 
-Before production is enabled, the operator must also provide encrypted off-host SQLite backups, a tested restore,
-the exact HTTPS hostname, and a dedicated Ubuntu host with Caddy as the public edge. The current repository contains
-the configuration contract and read-only preflight; it does not yet claim that the production release adapter or
-live production workflow is complete.
+Before customer data is admitted, the operator must provide encrypted off-host SQLite backups and a tested restore.
+The production adapter installs the release under `/opt/tennis/releases/<revision>`, preserves the prior release and
+a pre-change SQLite snapshot, activates Docker/Caddy, and verifies `https://tennis.fountain.coach/healthz` before
+returning a receipt. It never overwrites the active release in place.
 
 ## Rotation and incident response
 

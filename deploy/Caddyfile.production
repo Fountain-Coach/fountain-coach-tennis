@@ -1,0 +1,4 @@
+tennis.fountain.coach {
+  encode gzip
+  reverse_proxy tennis-app:8787
+}
