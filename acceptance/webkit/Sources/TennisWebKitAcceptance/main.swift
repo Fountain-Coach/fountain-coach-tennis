@@ -59,16 +59,27 @@ final class Runner: NSObject, WKNavigationDelegate {
   }
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    // Module scripts execute after didFinishNavigation. Give the landing
+    // animation a bounded startup window before collecting semantic evidence.
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+      self?.captureLandingState()
+    }
+  }
+
+  private func captureLandingState() {
     let script = """
     (() => {
       const links = [...document.querySelectorAll('a')].map(node => ({name: (node.innerText || node.getAttribute('aria-label') || '').trim(), href: node.getAttribute('href') || ''}));
       const buttons = [...document.querySelectorAll('button')].map(node => ({name: (node.innerText || node.getAttribute('aria-label') || '').trim(), hidden: node.hidden}));
       const headings = [...document.querySelectorAll('h1,h2,h3')].map(node => (node.innerText || '').trim()).filter(Boolean);
       const pong = document.querySelector('#pong-stage');
-      const result = {title: document.title, url: location.href, mainCount: document.querySelectorAll('main').length, headings, links, buttons, authGate: Boolean(document.querySelector('#auth-gate')), pong: pong ? {webgl: pong.dataset.webgl || 'not-started', error: pong.dataset.webglError || null, fallbackVisible: !document.querySelector('#pong-fallback')?.hidden} : null};
+      const fallback = document.querySelector('#pong-fallback');
+      const fallbackVisible = fallback ? getComputedStyle(fallback).display !== 'none' && !fallback.hidden : false;
+      const result = {title: document.title, url: location.href, mainCount: document.querySelectorAll('main').length, headings, links, buttons, authGate: Boolean(document.querySelector('#auth-gate')), pong: pong ? {webgl: pong.dataset.webgl || 'not-started', error: pong.dataset.webglError || null, fallbackVisible} : null};
       if (result.mainCount < 1) throw new Error('No main landmark exposed');
       if (!headings.some(value => value.includes('Zusammen') || value.includes('Fountain Coach'))) throw new Error('Expected customer-facing heading not exposed');
       if (!links.some(value => value.href === '/app/' || value.href.endsWith('/app/'))) throw new Error('Planning entry link not exposed');
+      if (result.pong?.webgl === 'not-started') throw new Error('Landing WebGL module did not become ready within the acceptance window');
       return result;
     })()
     """

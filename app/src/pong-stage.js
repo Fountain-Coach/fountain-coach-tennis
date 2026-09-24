@@ -31,6 +31,7 @@ try {
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
   stage.dataset.webgl = "ready";
   stage.classList.add("webgl-ready");
+  fallback?.setAttribute("hidden", "");
 } catch (error) {
   stage.classList.add("webgl-unavailable");
   fallback?.removeAttribute("hidden");
