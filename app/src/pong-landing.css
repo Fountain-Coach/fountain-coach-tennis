@@ -7,6 +7,18 @@
 .landing-ball.is-dragging { cursor:grabbing; }
 .landing-ball:focus-visible { outline:3px solid var(--pong-focus); outline-offset:5px; }
 .landing-ball canvas { display:block; width:100%; height:100%; }
+.pong-fallback { position:absolute; inset:12%; overflow:hidden; transform:skewY(-8deg); }
+.pong-fallback span,.pong-fallback i,.pong-fallback b,.pong-fallback em { position:absolute; display:block; }
+.pong-fallback span { inset:8% 12%; border:2px solid var(--pong-ink); border-radius:50%; animation:pong-orbit 4s linear infinite; }
+.pong-fallback i,.pong-fallback b { width:38%; height:3px; background:var(--pong-ink); top:50%; animation:pong-sway 1.7s ease-in-out infinite alternate; }
+.pong-fallback i { left:3%; transform:rotate(72deg); transform-origin:right center; }
+.pong-fallback b { right:3%; transform:rotate(-72deg); transform-origin:left center; animation-delay:-.8s; }
+.pong-fallback em { width:18px; height:18px; border-radius:50%; background:var(--pong-ink); left:50%; top:50%; animation:pong-bounce 2.4s ease-in-out infinite alternate; }
+@keyframes pong-orbit { to { transform:rotate(360deg); } }
+@keyframes pong-sway { to { opacity:.55; transform:rotate(82deg) scaleX(.85); } }
+@keyframes pong-bounce { to { transform:translate(110px,-70px); } }
+.webgl-unavailable #pong-canvas { display:none; }
+.webgl-unavailable .pong-fallback { display:block; }
 .pong-audio { position:absolute; right:1rem; bottom:1rem; z-index:2; border:1px solid var(--pong-ink); background:var(--pong-paper); color:var(--pong-ink); padding:.65rem .85rem; font:inherit; font-size:.72rem; font-weight:800; cursor:pointer; }
 .pong-audio:focus-visible { outline:3px solid var(--pong-focus); outline-offset:3px; }
 .landing-copy { max-width:48rem; margin:0 auto; }

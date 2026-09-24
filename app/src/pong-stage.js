@@ -4,6 +4,7 @@ import * as CANNON from "cannon-es";
 const canvas = document.querySelector("#pong-canvas");
 const stage = document.querySelector("#pong-stage");
 const audioButton = document.querySelector("#pong-audio");
+const fallback = document.querySelector("#pong-fallback");
 if (!canvas || !stage) throw new Error("Pong stage mount is missing");
 
 const mono = window.matchMedia?.("(prefers-color-scheme: dark)").matches
@@ -25,7 +26,20 @@ function updateCamera() {
   camera.lookAt(cameraTarget);
 }
 updateCamera();
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  stage.dataset.webgl = "ready";
+} catch (error) {
+  stage.classList.add("webgl-unavailable");
+  fallback?.removeAttribute("hidden");
+  stage.dataset.webgl = "unavailable";
+  console.warn("WebGL animation unavailable; using the landing fallback.", error);
+}
+if (!renderer) {
+  audioButton?.setAttribute("disabled", "disabled");
+  throw new Error("WebGL renderer unavailable");
+}
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
 const world = new CANNON.World({ gravity: new CANNON.Vec3(0, -9.82, 0) });
