@@ -35,6 +35,7 @@ try {
   stage.classList.add("webgl-unavailable");
   fallback?.removeAttribute("hidden");
   stage.dataset.webgl = "unavailable";
+  stage.dataset.webglError = String(error?.message || error).slice(0, 240);
   console.warn("WebGL animation unavailable; using the landing fallback.", error);
 }
 if (!renderer) {
