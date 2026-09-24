@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import * as CANNON from "cannon-es";
+import * as THREE from "/node_modules/three/build/three.module.js";
+import * as CANNON from "/node_modules/cannon-es/dist/cannon-es.js";
 
 const canvas = document.querySelector("#pong-canvas");
 const stage = document.querySelector("#pong-stage");
@@ -142,7 +142,7 @@ async function enableAudio() {
   if (csound) return;
   audioContext = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: "interactive" });
   await audioContext.resume();
-  Csound ??= (await import("@csound/browser")).default;
+  Csound ??= (await import("/node_modules/@csound/browser/dist/csound.js")).default;
   csound = await Csound({ audioContext, autoConnect: false, useWorker: false });
   await csound.setOption("-odac");
   await csound.setOption("-m0");
