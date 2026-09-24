@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 const root = resolve(new URL('..', import.meta.url).pathname);
 const args = process.argv.slice(2);
 const command = args[0] || 'help';
+const skipPublicCheck = args.includes('--skip-public-check');
 const environment = value('--environment') || value('-e') || process.env.TENNIS_DEPLOY_ENVIRONMENT || 'staging';
 
 function value(flag) {
@@ -210,9 +211,9 @@ function deployProduction(p, revision) {
       `ln -sfn "$release" ${shellQuote(`${releaseRoot}/active`)}`,
       `docker compose -p tennis-production -f "$release/deploy/compose.production.yml" up -d --build`,
       `docker compose -p tennis-production -f "$release/deploy/compose.production.yml" exec -T tennis-app node -e 'fetch("http://127.0.0.1:8787/healthz").then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))'`,
-      `curl --fail --silent --show-error --retry 30 --retry-all-errors --retry-delay 2 --location https://${p.hostname}/healthz >/dev/null`,
+      ...(skipPublicCheck ? [] : [`curl --fail --silent --show-error --retry 30 --retry-all-errors --retry-delay 2 --location https://${p.hostname}/healthz >/dev/null`]),
       'trap - ERR',
-      `printf '{"schema":"fountain-coach.tennis.deploy-receipt.v2","state":"succeeded","environment":"production","revision":"${revision}","host":"${p.host}","hostname":"${p.hostname}","url":"https://${p.hostname}/","health":"https://${p.hostname}/healthz","release":"%s","rollback":"%s"}\n' "$release" "\${previous:-none}"`,
+      `printf '{"schema":"fountain-coach.tennis.deploy-receipt.v2","state":"${skipPublicCheck ? 'prepared' : 'succeeded'}","environment":"production","revision":"${revision}","host":"${p.host}","hostname":"${p.hostname}","url":"https://${p.hostname}/","health":"https://${p.hostname}/healthz","publicReadback":"${skipPublicCheck ? 'skipped' : 'verified'}","release":"%s","rollback":"%s"}\n' "$release" "\${previous:-none}"`,
       `rm -f ${shellQuote(remoteArchive)} ${shellQuote(remoteEnv)}`
     ].join('; ');
     const result = execFileSync('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', p.key,
