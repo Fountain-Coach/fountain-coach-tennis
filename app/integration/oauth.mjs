@@ -225,6 +225,22 @@ export function isAdminIdentity(identity, env = process.env) {
   return Boolean(identity?.email && emails.has(identity.email.toLowerCase()));
 }
 
+function configuredPlayerIdentities(env = process.env) {
+  return new Map(String(env.TENNIS_PLAYER_IDENTITIES || '').split(',').map(value => value.trim()).filter(Boolean).map(entry => {
+    const separator = entry.indexOf('=');
+    return separator > 0 ? [entry.slice(0, separator).trim().toLowerCase(), entry.slice(separator + 1).trim()] : ['', ''];
+  }).filter(([email, playerId]) => email && /^[A-Za-z0-9_-]+$/.test(playerId)));
+}
+
+export function playerIdForIdentity(identity, env = process.env) {
+  return identity?.email ? configuredPlayerIdentities(env).get(identity.email.toLowerCase()) || null : null;
+}
+
+export function roleForIdentity(identity, env = process.env) {
+  if (isAdminIdentity(identity, env)) return 'admin';
+  return playerIdForIdentity(identity, env) ? 'player' : null;
+}
+
 export function configuredProviderName(env = process.env) {
   const name = String(env.OAUTH_IDP || 'google');
   requireOAuthProvider(name, env);

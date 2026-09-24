@@ -9,7 +9,7 @@ import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import * as z from 'zod/v4';
 import { emptyState, readModel } from './integration/tennis-service.mjs';
 import { createTennisAuthority } from './integration/tennis-authority.mjs';
-import { approveOAuthConsent, authorizeOAuthRequest, beginOAuth, beginOAuthConsent, completeOAuth, createLocalOAuthSession, configuredProviderName, configuredProviders, exchangeAuthorizationCode, isAdminIdentity, oauthMetadata, oauthSessionCookie, protectedResourceMetadata, readOAuthAccessToken, readOAuthSession, refreshOAuthToken, registerOAuthClient, revokeOAuthSession } from './integration/oauth.mjs';
+import { approveOAuthConsent, authorizeOAuthRequest, beginOAuth, beginOAuthConsent, completeOAuth, createLocalOAuthSession, configuredProviderName, configuredProviders, exchangeAuthorizationCode, isAdminIdentity, oauthMetadata, oauthSessionCookie, playerIdForIdentity, protectedResourceMetadata, readOAuthAccessToken, readOAuthSession, refreshOAuthToken, registerOAuthClient, revokeOAuthSession, roleForIdentity } from './integration/oauth.mjs';
 
 const port = Number(process.env.PORT || 8787);
 const stateFile = resolve(process.env.TENNIS_STATE_FILE || '.runtime/tennis-state.json');
@@ -78,10 +78,26 @@ function authorized(request, write = false) {
   if (bearerToken && received.length === expected.length && timingSafeEqual(Buffer.from(received), Buffer.from(expected))) return { mode: 'static', scope: 'tennis.read tennis.write' };
   const token = received.startsWith('Bearer ') ? readOAuthAccessToken(received.slice(7)) : null;
   const expectedResource = `${publicBaseUrl(request)}/mcp`;
-  if (token && (!token.resource || token.resource === expectedResource) && (!write || token.scope.split(' ').includes('tennis.write'))) return { mode: 'oauth', ...token };
+  const tokenRole = roleForIdentity(token, process.env);
+  if (token && (!token.resource || token.resource === expectedResource) && tokenRole && (!write ? token.scope.split(' ').includes('tennis.read') : tokenRole === 'admin' && token.scope.split(' ').includes('tennis.write'))) return { mode: 'oauth', role: tokenRole, playerId: playerIdForIdentity(token, process.env), ...token };
   const session = readOAuthSession(cookies(request).tennis_oauth_session);
-  if (session && isAdminIdentity(session, process.env)) return { mode: 'oauth-session', ...session, scope: 'tennis.read tennis.write' };
+  const sessionRole = roleForIdentity(session, process.env);
+  if (session && sessionRole && (!write || sessionRole === 'admin')) return { mode: 'oauth-session', role: sessionRole, playerId: playerIdForIdentity(session, process.env), ...session, scope: 'tennis.read tennis.write' };
   return !bearerToken && !write && process.env.TENNIS_ALLOW_ANONYMOUS_READ === '1' ? { mode: 'development' } : null;
+}
+
+function playerReadModel(model, playerId) {
+  const schedule = model.schedule.map(day => ({ ...day, matches: day.matches.filter(match => match.a === playerId || match.b === playerId) })).filter(day => day.matches.length);
+  const matchPlayerIds = new Set([playerId, ...schedule.flatMap(day => day.matches.flatMap(match => [match.a, match.b])).filter(Boolean)]);
+  const ownPlayer = model.players.find(player => player.id === playerId);
+  return {
+    ...model,
+    players: model.players.filter(player => matchPlayerIds.has(player.id)).map(player => player.id === playerId ? player : ({ id: player.id, name: player.name, active: player.active })),
+    schedule,
+    analysis: null,
+    absences: ownPlayer ? model.absences.filter(day => day.players.includes(ownPlayer.name)) : [],
+    validation: { valid: true, errors: [] }
+  };
 }
 
 function textResult(payload) {
@@ -281,8 +297,9 @@ app.post('/oauth/consent', (request, response) => {
 });
 app.get('/auth/session', (request, response) => {
   const session = readOAuthSession(cookies(request).tennis_oauth_session);
-  const admitted = Boolean(session && isAdminIdentity(session, process.env));
-  response.json({ authenticated: admitted, provider: admitted ? session.provider : null, dataAccess: admitted, reason: admitted ? 'admin session admitted' : 'login required or identity not admitted' });
+  const role = roleForIdentity(session, process.env);
+  const admitted = Boolean(session && role);
+  response.json({ authenticated: admitted, provider: admitted ? session.provider : null, role: admitted ? role : null, playerId: admitted && role === 'player' ? playerIdForIdentity(session, process.env) : null, dataAccess: admitted, reason: admitted ? `${role} session admitted` : 'login required or identity not admitted' });
 });
 app.post('/auth/logout', (request, response) => {
   revokeOAuthSession(cookies(request).tennis_oauth_session);
@@ -292,14 +309,16 @@ app.post('/auth/logout', (request, response) => {
 app.get(['/app', '/app/'], (request, response, next) => {
   if (!localAuthEnabled) return next();
   const session = readOAuthSession(cookies(request).tennis_oauth_session);
-  if (!session || !isAdminIdentity(session, process.env)) return response.redirect(303, '/auth/login');
+  if (!session || !roleForIdentity(session, process.env)) return response.redirect(303, '/auth/login');
   next();
 });
 app.get(['/app', '/app/'], (request, response) => response.sendFile(resolve(staticRoot, 'app.html')));
 app.get('/healthz', (request, response) => response.json({ ok: true, service: 'fountain-coach-tennis' }));
 app.get('/api/state', apiLimiter, async (request, response) => {
-  if (!authorized(request)) return response.status(401).set('WWW-Authenticate', `Bearer resource_metadata="${publicBaseUrl(request)}/.well-known/oauth-protected-resource/mcp", scope="tennis.read tennis.write"`).json({ error: 'Bearer authentication required.' });
-  response.json(nativeBridgeUrl ? await nativeModel() : readModel(await authority.load()));
+  const identity = authorized(request);
+  if (!identity) return response.status(401).set('WWW-Authenticate', `Bearer resource_metadata="${publicBaseUrl(request)}/.well-known/oauth-protected-resource/mcp", scope="tennis.read tennis.write"`).json({ error: 'Bearer authentication required.' });
+  const model = nativeBridgeUrl ? await nativeModel() : readModel(await authority.load());
+  response.json(identity.role === 'player' ? playerReadModel(model, identity.playerId) : model);
 });
 app.post('/api/operation', apiLimiter, async (request, response) => {
   if (!authorized(request, true)) return response.status(401).set('WWW-Authenticate', `Bearer resource_metadata="${publicBaseUrl(request)}/.well-known/oauth-protected-resource/mcp", scope="tennis.read tennis.write"`).json({ error: 'Bearer authentication required.' });

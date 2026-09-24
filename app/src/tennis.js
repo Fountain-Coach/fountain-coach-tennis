@@ -15,6 +15,15 @@ const localSnapshot = () => ({
 });
 let { players, schedule, configuration } = localSnapshot();
 let remoteMode = false;
+let currentRole = null;
+
+function applyRole(role) {
+  currentRole = role;
+  const player = role === 'player';
+  document.querySelectorAll('#generate, #import-local, #reset, [data-tab="players"], #players').forEach(element => { element.hidden = player; });
+  document.body.classList.toggle('player-mode', player);
+  $('#connection').textContent = player ? 'ANGEMELDET · persönlicher Spielplan' : 'ANGEMELDET · gemeinsamer Spielplan';
+}
 
 function save() {
   localStorage.setItem('fountain-tennis-players', JSON.stringify(players));
@@ -61,12 +70,12 @@ async function enforceAppGate() {
     if (!response.ok) throw new Error('Anmeldedienst nicht erreichbar.');
     const session = await response.json();
     if (!session.authenticated) return;
+    applyRole(session.role);
     const stateResponse = await fetch('/api/state', { credentials: 'same-origin' });
     if (!stateResponse.ok) throw new Error('Geschützter Spielplan ist nicht erreichbar.');
     useRemoteModel(await stateResponse.json());
     remoteMode = true;
     $('#import-local').hidden = false;
-    $('#connection').textContent = 'ANGEMELDET · gemeinsamer Spielplan';
     dashboard.removeAttribute('aria-hidden');
     gate.hidden = true;
     render();

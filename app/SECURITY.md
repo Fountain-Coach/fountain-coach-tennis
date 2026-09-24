@@ -15,6 +15,10 @@ the required legal review for the target jurisdiction.
   an explicitly configured native bridge is the selected production authority.
 - The MCP OAuth surface uses authorization-code + PKCE, dynamic client registration, explicit consent, `tennis.read`
   and `tennis.write` scopes, and refresh tokens. The static `MCP_BEARER_TOKEN` is an owner-only compatibility lane.
+- Player access is an explicit `TENNIS_PLAYER_IDENTITIES` mapping of verified OAuth email to an existing player ID
+  (`email=player-id,email=player-id`). Player sessions receive only their own matches and the minimum opponent
+  identity needed to understand a match; player sessions cannot mutate the shared schedule. An empty mapping admits no
+  player identities.
 - When `TENNIS_STATE_BACKEND=sqlite`, OAuth clients, grants, challenges, consent requests, access tokens, refresh
   tokens, and browser sessions persist in the private SQLite authority. Token keys are stored as SHA-256 hashes;
   values remain server-side and are never sent to the browser. JSON mode remains a development transition and is

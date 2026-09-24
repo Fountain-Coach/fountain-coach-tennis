@@ -242,3 +242,18 @@ documents the exact ChatGPT Developer Mode endpoint and the explicit read-before
 Remaining external action: create the Custom App in ChatGPT Developer Mode using
 `https://tennis.fountain.coach/mcp`, complete the OAuth consent prompt, and exercise one read-only tool before any
 confirmed write. ChatGPT owns that dynamic client registration and cannot be completed by a repository deploy alone.
+
+## Current bounded change — customer player read-only boundary (2026-09-24)
+
+Capability: make the normal Tennis web app useful for players without requiring ChatGPT workspace membership or an AI
+subscription.
+
+Implementation result: verified OAuth identities can now be mapped in protected runtime configuration with
+`TENNIS_PLAYER_IDENTITIES=email=player-id,...`. A mapped player receives a filtered personal schedule and the minimum
+opponent identity needed to understand each match. Player writes and organizer controls are rejected/hidden; the
+existing admin identity retains the shared organizer view and mutations. The mapping is empty by default, so no
+participant data was added to the public repository or production configuration in this slice.
+
+Proof: player OAuth/session contract, filtered state contract, rejected player mutation, full application tests, MCP and
+remote authority contracts, syntax checks, privacy/diff checks. This is a read-only identity seam; player onboarding,
+consent, notifications, and richer member administration remain separate work.

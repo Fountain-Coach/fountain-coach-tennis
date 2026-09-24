@@ -57,6 +57,12 @@ variables:
 The live release adapter also consumes `TENNIS_PRODUCTION_GITHUB_OAUTH_CLIENT_ID`. The verified GitHub admin email is
 the protected Environment variable `TENNIS_PRODUCTION_ADMIN_EMAILS`; it is not embedded in the source release.
 
+For player access, configure `TENNIS_PLAYER_IDENTITIES` only in the protected production environment, never in the
+repository. Its value is a comma-separated mapping from each verified OAuth email to an existing player ID, for example
+`player@example.com=p1,another@example.com=p2`. The mapping grants read-only access to that player's filtered schedule;
+it does not grant schedule editing, player administration, or MCP write access. Do not add a mapping until the
+corresponding player record and consent/privacy basis have been reviewed.
+
 Non-secret deployment values may be stored as Environment variables, for example the exact host, deploy user,
 hostname, and public OAuth callback URI. Keep the production environment separate from staging.
 
