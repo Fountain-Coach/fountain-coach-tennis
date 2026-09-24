@@ -13,9 +13,10 @@ the required legal review for the target jurisdiction.
   secrets or put them in browser code.
 - The MCP OAuth surface uses authorization-code + PKCE, dynamic client registration, explicit consent, `tennis.read`
   and `tennis.write` scopes, and refresh tokens. The static `MCP_BEARER_TOKEN` is an owner-only compatibility lane.
-- OAuth client, grant, and session records are currently process-local. Production rollout must move these records and
-  token-signing/revocation custody into the existing SecretStore/FountainStore host adapter before claiming restart-safe
-  continuity or multi-user operation.
+- When `TENNIS_STATE_BACKEND=sqlite`, OAuth clients, grants, challenges, consent requests, access tokens, refresh
+  tokens, and browser sessions persist in the private SQLite authority. Token keys are stored as SHA-256 hashes;
+  values remain server-side and are never sent to the browser. JSON mode remains a development transition and is
+  process-local. Production still requires protected SQLite storage, backups, rotation and operational recovery.
 - Set `TENNIS_STATE_FILE` outside the web root on a private volume with backups and restricted file permissions.
 - Set `CORS_ORIGINS` to an explicit allowlist; do not use `*`.
 - Configure ChatGPT/OpenAI approval as `always` for all write tools and keep the server-side `confirm: true` gate.

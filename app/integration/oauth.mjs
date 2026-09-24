@@ -1,5 +1,6 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { createOAuthCollection } from './oauth-store.mjs';
 
 const providers = Object.freeze({
   google: Object.freeze({
@@ -34,13 +35,13 @@ const providerEnv = Object.freeze({
   github: Object.freeze({ clientId: 'GITHUB_OAUTH_CLIENT_ID', clientSecret: 'GITHUB_OAUTH_CLIENT_SECRET', redirectUri: 'GITHUB_OAUTH_REDIRECT_URI' })
 });
 
-const pendingChallenges = new Map();
-const sessions = new Map();
-const clients = new Map();
-const authorizationCodes = new Map();
-const accessTokens = new Map();
-const refreshTokens = new Map();
-const consentRequests = new Map();
+const pendingChallenges = createOAuthCollection('pending_challenges');
+const sessions = createOAuthCollection('sessions');
+const clients = createOAuthCollection('clients');
+const authorizationCodes = createOAuthCollection('authorization_codes');
+const accessTokens = createOAuthCollection('access_tokens');
+const refreshTokens = createOAuthCollection('refresh_tokens');
+const consentRequests = createOAuthCollection('consent_requests');
 const challengeLifetimeMs = 10 * 60 * 1000;
 const sessionLifetimeMs = 8 * 60 * 60 * 1000;
 const authorizationCodeLifetimeMs = 60 * 1000;

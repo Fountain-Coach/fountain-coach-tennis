@@ -14,7 +14,7 @@ Date: 2026-09-24
 ## Not yet established
 
 - Complete backend CRUD on top of the now-established normalized SQLite seam.
-- Durable sessions, role enforcement, admin surface, migration, backup/restore, and multi-user isolation.
+- Role administration, admin surface, backup/restore, and multi-user isolation.
 - Production deployment, live GitHub OAuth, or live ChatGPT/MCP connectivity.
 
 No unestablished item is claimed as complete by this audit.
@@ -27,6 +27,8 @@ No unestablished item is claimed as complete by this audit.
 - The JSON file adapter remains the default transition backend; frontend localStorage cutover is not claimed.
 - Authenticated browser writes now use the direct server operation contract; localStorage remains read-only fallback
   state and is importable only through an explicit confirmed `import_state` action.
+- SQLite mode now persists OAuth sessions and grants through hashed-key private records; JSON transition mode remains
+  process-local and no production continuity claim is made for it.
 
 ## Estate-derived controls now adopted
 

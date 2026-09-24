@@ -45,7 +45,7 @@ authoritative entities.
 | Players | localStorage key fountain-tennis-players; server JSON or selectable SQLite players | Browser fallback or authenticated server API/MCP | SQLite `players`, `player_unavailability`, and `player_availability_rules` |
 | Schedule | localStorage key fountain-tennis-schedule; server JSON or selectable SQLite schedule | Browser fallback or authenticated server API/MCP | SQLite `schedule_days` and `matches` |
 | Configuration | localStorage key fountain-tennis-configuration; server JSON or selectable SQLite configuration | Browser fallback or authenticated server API/MCP | SQLite `tennis_configuration` record |
-| OAuth sessions/grants | Process-local maps in integration/oauth.mjs | Current process only | Durable secure session/grant records |
+| OAuth sessions/grants | SQLite `oauth_records` when SQLite backend is selected; process-local in JSON transition mode | Private server authority in SQLite mode | Rotation, retention, backup/recovery and production operational proof |
 | Audit events | JSONL path TENNIS_AUDIT_FILE | Server append-only file | Durable redacted audit events |
 | MCP transport sessions | Process-local map in mcp-server.mjs | Current process only | Bounded durable or explicitly ephemeral transport policy |
 | Export | Browser-generated download | Browser action | Authenticated export endpoint with audit/retention policy |

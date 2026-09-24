@@ -95,9 +95,22 @@ configuration form is guarded so the current UI does not fail during this transi
 Proof: browser source contract, import/authority tests, core tests, MCP contract, remote API contract, syntax checks,
 privacy scan, diff check, semantic commit, and push to `main`.
 
-## Next bounded change — durable identity and role boundary
+## Current bounded change — durable identity and role boundary
 
 Capability: replace process-local OAuth sessions and grants with durable, secure session state and enforce local
 application roles at the backend boundary before adding administrative UI.
 
 WebKit semantic acceptance and HCloud service release remain separate gates.
+
+Implementation result: when the SQLite backend is selected, OAuth challenges, sessions, dynamic clients,
+authorization codes, consent requests, access tokens, and refresh tokens use a private SQLite record store with
+hashed keys. Existing admin-email role admission and scope checks remain the backend authorization boundary; no
+unadmitted member role or admin UI was invented. JSON transition mode remains process-local.
+
+Proof: restart persistence test, token-material non-storage assertion, existing OAuth/provider tests, MCP/API
+contracts, syntax checks, privacy scan, diff check, semantic commit, and push to `main`.
+
+## Next bounded change — operational data recovery boundary
+
+Capability: define and test protected SQLite backup/restore, retention, and rollback semantics before HCloud service
+release or production customer data use.

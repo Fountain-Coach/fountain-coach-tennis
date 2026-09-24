@@ -7,12 +7,13 @@
   },
   "scripts": {
     "preview": "node preview.mjs",
-    "test": "node tests/tennis.test.mjs && node tests/authority-boundary.test.mjs && node tests/inventory.test.mjs && node tests/sqlite-authority.test.mjs",
+    "test": "node tests/tennis.test.mjs && node tests/authority-boundary.test.mjs && node tests/inventory.test.mjs && node tests/sqlite-authority.test.mjs && node tests/oauth-persistence.test.mjs",
     "test:e2e": "playwright test",
     "test:mcp": "node tests/mcp-contract.test.mjs",
     "test:remote": "node tests/remote-browser-contract.test.mjs",
     "test:sqlite": "node tests/sqlite-authority.test.mjs",
-    "check": "node --check src/tennis.js && node --check src/pong-stage.js && node --check tests/tennis.test.mjs && node --check tests/authority-boundary.test.mjs && node --check tests/inventory.test.mjs && node --check tests/sqlite-authority.test.mjs && node --check tests/mcp-contract.test.mjs && node --check tests/remote-browser-contract.test.mjs && node --check preview.mjs && node --check mcp-server.mjs && node --check integration/tennis-service.mjs && node --check integration/tennis-authority.mjs && node --check integration/sqlite-authority.mjs && node --check integration/oauth.mjs",
+    "test:oauth": "node tests/oauth-persistence.test.mjs",
+    "check": "node --check src/tennis.js && node --check src/pong-stage.js && node --check tests/tennis.test.mjs && node --check tests/authority-boundary.test.mjs && node --check tests/inventory.test.mjs && node --check tests/sqlite-authority.test.mjs && node --check tests/oauth-persistence.test.mjs && node --check tests/mcp-contract.test.mjs && node --check tests/remote-browser-contract.test.mjs && node --check preview.mjs && node --check mcp-server.mjs && node --check integration/tennis-service.mjs && node --check integration/tennis-authority.mjs && node --check integration/sqlite-authority.mjs && node --check integration/oauth-store.mjs && node --check integration/oauth.mjs",
     "server": "node mcp-server.mjs"
   },
   "devDependencies": {

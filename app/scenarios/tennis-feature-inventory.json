@@ -32,7 +32,6 @@
     "import_state"
   ],
   "deferred": [
-    "durable-oauth-sessions",
     "roles-and-admin",
     "legacy-localStorage-migration",
     "backup-and-restore",
