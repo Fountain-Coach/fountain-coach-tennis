@@ -160,6 +160,11 @@ The first implementation slice establishes the CLI contract, environment configu
 `inspect`, `plan`, and `verify` commands, and a mutation gate that fails closed until an explicit target profile and
 release adapter are configured. It does not claim a live staging or production deployment.
 
+The next staging adapter is intentionally isolated from the shared Mac mini edge: a Node 22 Tennis container and a
+Caddy container are composed on a dedicated Docker network, exposed only on LAN port 18080, with a named SQLite
+volume. It is a staging experience path, not production topology and not a replacement for the dedicated HCloud
+Ubuntu/Caddy release.
+
 Proof gate: CLI contract tests, skill validation, privacy scan, syntax checks, and `git diff --check` pass. A live
 deployment remains a separate witness requiring an explicitly configured target, credentials, rollback evidence, and
 remote read-back.

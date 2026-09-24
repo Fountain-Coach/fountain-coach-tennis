@@ -1,0 +1,25 @@
+services:
+  tennis-app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    expose:
+      - "8787"
+    volumes:
+      - tennis-data:/var/lib/tennis
+  tennis-edge:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    depends_on:
+      - tennis-app
+    ports:
+      - "18080:8080"
+    volumes:
+      - ./deploy/Caddyfile.staging:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+volumes:
+  tennis-data:
+  caddy-data:
+  caddy-config:
