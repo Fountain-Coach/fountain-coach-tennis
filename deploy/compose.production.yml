@@ -1,7 +1,7 @@
 services:
   tennis-app:
     build:
-      context: .
+      context: ../
       dockerfile: deploy/Dockerfile
     restart: unless-stopped
     env_file:
@@ -22,7 +22,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./deploy/Caddyfile.production:/etc/caddy/Caddyfile:ro
+      - ./Caddyfile.production:/etc/caddy/Caddyfile:ro
       - tennis-production-caddy-data:/data
       - tennis-production-caddy-config:/config
     networks:
