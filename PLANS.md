@@ -145,3 +145,21 @@ Capability: drive the admitted local OAuth session through WebKit, prove the aut
 confirmed server-backed mutation, and bind the result to a reproducible local runtime.
 
 Live GitHub OAuth, ChatGPT authorization, HCloud identity, Caddy/TLS, and service-release remain separate witnesses.
+
+## Current bounded change — agent-operated deployment contract
+
+Capability: make the repository operable by a non-technical administrator or coding agent through one checked-in
+`tennis-deploy` CLI, without exposing SSH details or credentials to the operator.
+
+The CLI owns target validation, source revision selection, release packaging, SSH transport, systemd/Caddy release
+steps, health/read-back, rollback, and a machine-readable receipt. The repository-local Codex skill is the agent
+entry point: a request such as “deploy the current main branch to staging” resolves to the CLI's inspect/plan/deploy
+workflow rather than an invented shell command. Secrets and private keys remain external to Git.
+
+The first implementation slice establishes the CLI contract, environment configuration boundary, non-mutating
+`inspect`, `plan`, and `verify` commands, and a mutation gate that fails closed until an explicit target profile and
+release adapter are configured. It does not claim a live staging or production deployment.
+
+Proof gate: CLI contract tests, skill validation, privacy scan, syntax checks, and `git diff --check` pass. A live
+deployment remains a separate witness requiring an explicitly configured target, credentials, rollback evidence, and
+remote read-back.
