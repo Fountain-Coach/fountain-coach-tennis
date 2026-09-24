@@ -16,7 +16,7 @@ services:
     ports:
       - "18080:8080"
     volumes:
-      - ./deploy/Caddyfile.staging:/etc/caddy/Caddyfile:ro
+      - ./Caddyfile.staging:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
 volumes:
