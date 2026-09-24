@@ -1,0 +1,71 @@
+name: Deploy Tennis production
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type DEPLOY to authorize the production attempt
+        required: true
+        type: string
+
+concurrency:
+  group: tennis-production-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: ${{ inputs.confirmation == 'DEPLOY' }}
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Check out the requested source revision
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install application dependencies
+        run: npm ci --prefix app
+
+      - name: Verify repository and deployment contract
+        run: |
+          node deploy/tennis-deploy.mjs verify
+          node --check deploy/tennis-deploy.mjs
+
+      - name: Inspect production target
+        env:
+          TENNIS_DEPLOY_ENVIRONMENT: production
+          TENNIS_PRODUCTION_HOST: ${{ vars.TENNIS_PRODUCTION_HOST }}
+          TENNIS_PRODUCTION_USER: ${{ vars.TENNIS_PRODUCTION_USER }}
+          TENNIS_PRODUCTION_HOSTNAME: ${{ vars.TENNIS_PRODUCTION_HOSTNAME }}
+          TENNIS_PRODUCTION_SSH_KEY: ${{ secrets.TENNIS_PRODUCTION_SSH_KEY }}
+        run: node deploy/tennis-deploy.mjs inspect --environment production
+
+      - name: Show immutable release plan
+        env:
+          TENNIS_DEPLOY_ENVIRONMENT: production
+          TENNIS_PRODUCTION_HOST: ${{ vars.TENNIS_PRODUCTION_HOST }}
+          TENNIS_PRODUCTION_USER: ${{ vars.TENNIS_PRODUCTION_USER }}
+          TENNIS_PRODUCTION_HOSTNAME: ${{ vars.TENNIS_PRODUCTION_HOSTNAME }}
+        run: node deploy/tennis-deploy.mjs plan --environment production
+
+      - name: Attempt the typed release
+        env:
+          TENNIS_DEPLOY_ENVIRONMENT: production
+          TENNIS_DEPLOY_ALLOW_MUTATION: '1'
+          TENNIS_PRODUCTION_HOST: ${{ vars.TENNIS_PRODUCTION_HOST }}
+          TENNIS_PRODUCTION_USER: ${{ vars.TENNIS_PRODUCTION_USER }}
+          TENNIS_PRODUCTION_HOSTNAME: ${{ vars.TENNIS_PRODUCTION_HOSTNAME }}
+          TENNIS_PRODUCTION_SSH_KEY: ${{ secrets.TENNIS_PRODUCTION_SSH_KEY }}
+          GITHUB_OAUTH_CLIENT_SECRET: ${{ secrets.TENNIS_PRODUCTION_GITHUB_OAUTH_CLIENT_SECRET }}
+          SESSION_SECRET: ${{ secrets.TENNIS_PRODUCTION_SESSION_SECRET }}
+          MCP_BEARER_TOKEN: ${{ secrets.TENNIS_PRODUCTION_MCP_BEARER_TOKEN }}
+          TENNIS_NATIVE_BEARER_TOKEN: ${{ secrets.TENNIS_PRODUCTION_NATIVE_BEARER_TOKEN }}
+        run: node deploy/tennis-deploy.mjs deploy --environment production --yes

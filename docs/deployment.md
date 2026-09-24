@@ -81,3 +81,7 @@ node deploy/tennis-deploy.mjs verify
 
 Mutation remains fail-closed until the typed production release adapter has been implemented and accepted. A GitHub
 push is source publication, not a production deployment.
+
+The checked-in workflow is `.github/workflows/deploy-production.yml`. It is manually triggered, uses the protected
+`production` Environment, serializes production attempts, and requires typing `DEPLOY`. Until the release adapter is
+accepted, its final step stops with a bounded failure rather than changing the host.
