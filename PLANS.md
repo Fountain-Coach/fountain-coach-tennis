@@ -243,6 +243,20 @@ Remaining external action: create the Custom App in ChatGPT Developer Mode using
 `https://tennis.fountain.coach/mcp`, complete the OAuth consent prompt, and exercise one read-only tool before any
 confirmed write. ChatGPT owns that dynamic client registration and cannot be completed by a repository deploy alone.
 
+## Current bounded change — publish the customer-facing release description (2026-09-24)
+
+Capability: document the working Tennis release as the primary product and keep optional identity mapping separate
+from the customer promise.
+
+Implementation result: the README now opens in German, links to the public release, describes the ODT-derived four-
+match/75-minute schedule, documents JSON migration and organizer use, marks personal player access as optional, and
+explicitly excludes ChatGPT/MCP from the current product requirement. A README screenshot was generated from a
+sanitized release fixture with generic player names. Configuration-driven end times and match counts now correctly
+display `12:00–13:15` through `15:45–17:00` and 120 games for the four-match release.
+
+Proof: sanitized screenshot inspection, focused application tests, syntax checks, privacy/diff checks. The screenshot
+is illustrative release evidence; it contains no customer roster or production state.
+
 ## Current bounded change — customer player read-only boundary (2026-09-24)
 
 Capability: make the normal Tennis web app useful for players without requiring ChatGPT workspace membership or an AI

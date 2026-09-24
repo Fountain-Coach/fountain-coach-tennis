@@ -1,29 +1,56 @@
-# Fountain Coach Tennisrunde
+# Tennisrunde
 
-This public repository is the privacy-scrubbed initial customer-facing snapshot of the `tennis.fountain.coach` subdomain.
+Hallo und willkommen bei der Tennisrunde von Fountain Coach.
 
-It contains the current tennis landing page, browser application, scheduling rules, MCP/OAuth integration seam, tests, and the estate landing projection. The starter model uses generic player labels; no participant names, availability dates, runtime state, credentials, tokens, or generated private artifacts are included.
+Dieser Release ist eine klare, gemeinsame Spielplan-App für eine regelmäßige Tennisrunde: Regeln hinterlegen,
+einen fairen Plan erzeugen, Änderungen prüfen und den fertigen Plan als Excel-Datei exportieren.
 
-## Why “Vinegarium”
+![Tennisrunde – aktueller Release](docs/assets/tennis-release.png)
 
-`vinegarium.de` is the customer-owned domain and business identity behind this work. Its owner is also one of the
-tennis players. We are developing the business together, beginning with a deliberately focused spare-time project:
-the first practical product is a tennis match and shared tennis round.
+## Aktueller Release
 
-That is why the dedicated HCloud host is named `vinegarium`, while the customer-facing publishing domain remains
-`tennis.fountain.coach`. The name describes the business context; Tennis is the first small, useful application we
-are building within it. This repository intentionally does not publish the owner’s personal name or participant data.
+Die öffentliche Anwendung läuft unter [tennis.fountain.coach](https://tennis.fountain.coach/). Der aktuelle Release
+bildet die Regeln aus `Spieltagsprompt-ExtendedBE.odt` ab:
 
-## Current status
+- zwölf bearbeitbare Spielerinnen und Spieler;
+- alle Samstage vom 03.10.2026 bis 24.04.2027;
+- vier Spiele pro Spieltag: 12:00, 13:15, 14:30 und 15:45 Uhr;
+- 75 Minuten pro Spiel, acht eingesetzte und vier spielfreie Spieler;
+- feste Spielzeiten, Abwesenheiten, Fairnessberechnung und Validierung;
+- Filter nach Spieler und Datum sowie manuelle, erneut validierte Änderungen;
+- deutscher Excel-Export;
+- server-authoritative Speicherung mit SQLite und geschütztem Organizer-Zugang;
+- portable JSON-Datenübernahme aus der früheren Desktop-Version.
 
-The initial snapshot remains a feature-complete single-browser/static-preview application. The server now has a
-normalized SQLite authority seam selected with `TENNIS_STATE_BACKEND=sqlite`, while browser `localStorage` remains
-the current frontend persistence mode until the explicit authority cutover. It is not yet the completed multi-user
-production application.
+Die Abbildung oben verwendet ausschließlich anonymisierte Bezeichnungen (`Spieler 01` usw.). Private Namen,
+Abwesenheiten und Laufzeitdaten gehören nicht in dieses öffentliche Repository.
 
-The attached implementation prompt is treated as the target specification for the next phases: server-authoritative SQLite, GitHub identity, local application roles, protected `/admin`, full domain CRUD, migration/import/export, auditability, backup/restore, multi-user tests, and independently reproducible deployment. See [docs/implementation-map.md](docs/implementation-map.md).
+## Verwendung
 
-## Run locally
+1. [Tennisrunde öffnen](https://tennis.fountain.coach/) und als Organizer anmelden.
+2. Im Spielplan **Daten importieren** wählen, wenn ein privater JSON-Export aus der Desktop-Version vorliegt.
+3. **Spielplan erzeugen** wählen und die Validierung prüfen.
+4. Spieler, Abwesenheiten und feste Zeiten im Bereich **Spieler** bearbeiten.
+5. Den fertigen Plan bei Bedarf über **Excel exportieren** ausgeben.
+
+Die Importdatei wird geprüft und nur nach ausdrücklicher Bestätigung in den gemeinsamen Spielplan übernommen.
+
+## Optional: persönliche Spielerzugänge
+
+Der aktuelle Release funktioniert vollständig als gemeinsamer Organizer-Spielplan. Individuelle Spielerzugänge sind
+optional und keine Voraussetzung für die Nutzung.
+
+Wenn sie später benötigt werden, kann ein verifiziertes OAuth-Konto einem vorhandenen Spieler zugeordnet werden.
+Dann sieht diese Person nur den eigenen Spielplan und die für das Verständnis einer Begegnung nötigen gegnerischen
+Namen. Spielerzugänge sind read-only; Spielplanänderungen bleiben beim Organizer. Die Zuordnung wird ausschließlich
+in der geschützten Produktionsumgebung gepflegt und nicht in Git eingecheckt.
+
+## Bewusste Produktgrenze
+
+Der Release ist kein ChatGPT- oder MCP-Produkt und benötigt keine ChatGPT-Mitgliedschaft. Eine externe KI-Anbindung
+ist nicht Teil des aktuellen Kundenversprechens. Der Nutzen liegt zunächst im verlässlichen gemeinsamen Spielplan.
+
+## Entwicklung
 
 ```sh
 npm ci --prefix app
@@ -31,30 +58,9 @@ npm test --prefix app
 npm run test:e2e --prefix app
 ```
 
-The current static preview is:
+Die Anwendung verwendet Node/ESM. Für lokale Entwicklung gelten `.env`-Werte; Produktionsgeheimnisse liegen in den
+geschützten GitHub-Environment-Secrets. Details stehen in [docs/deployment.md](docs/deployment.md).
 
-```sh
-node app/preview.mjs
-```
-
-The native macOS/WebKit acceptance lane is built and run against a served URL with:
-
-```sh
-swift build --package-path acceptance/webkit
-acceptance/webkit/.build/arm64-apple-macosx/debug/TennisWebKitAcceptance --url http://127.0.0.1:8787/
-```
-
-It records DOM-semantic evidence and a fixed viewport snapshot in the selected output directory. It is not a
-deployment mechanism.
-
-This is development-only. Configure a real HTTPS deployment, server-side state, OAuth, and operational controls before using customer data.
-
-## Privacy and ownership
-
-- [PRIVACY.md](PRIVACY.md) records what was removed from this public seed and what remains to be implemented.
-- [SECURITY.md](app/SECURITY.md) describes the current security boundary and unresolved production requirements.
-- [docs/deployment.md](docs/deployment.md) explains local `.env` development and protected GitHub production secrets.
-- [docs/footer-claim.md](docs/footer-claim.md) preserves the estate footer claim verbatim and explains its scope.
-- OAuth client values, session secrets, bearer tokens, player data, and deployment credentials belong in the operator's secret/configuration systems, never in Git.
-
-GitHub identifies a person; the Tennis application must own its local account, role, and authorization. Repository ownership and hosting administration remain separate authority domains.
+Weitere technische Grenzen und Datenschutzanforderungen stehen in [app/SECURITY.md](app/SECURITY.md) und
+[PRIVACY.md](PRIVACY.md). Der Kundenname „Vinegarium“ erklärt die Benennung der dedizierten Hosting-Umgebung;
+die veröffentlichte Domain bleibt `tennis.fountain.coach`.
