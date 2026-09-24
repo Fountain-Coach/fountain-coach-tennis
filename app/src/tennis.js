@@ -1,4 +1,4 @@
-import { DEFAULT_PLAYERS, TIMES, absenceReport, available, fairness, formatDate, generateSchedule, normalizeUnavailable, validateSchedule } from './tennis-core.js';
+import { DEFAULT_CONFIGURATION, DEFAULT_PLAYERS, absenceReport, available, fairness, formatDate, generateSchedule, normalizeUnavailable, validateSchedule } from './tennis-core.js';
 
 const appMode = new URLSearchParams(window.location.search).get('app') === '1'
   || window.location.pathname === '/app/'
@@ -9,7 +9,7 @@ const $ = selector => document.querySelector(selector);
 const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
 let players = JSON.parse(localStorage.getItem('fountain-tennis-players') || 'null') || structuredClone(DEFAULT_PLAYERS);
 let schedule = JSON.parse(localStorage.getItem('fountain-tennis-schedule') || 'null') || [];
-let configuration = JSON.parse(localStorage.getItem('fountain-tennis-configuration') || 'null') || { seasonStart: '2026-10-03', seasonEnd: '2027-04-24', weekdays: [7], times: [...TIMES], matchDurationMinutes: 60, matchesPerDay: 5 };
+let configuration = JSON.parse(localStorage.getItem('fountain-tennis-configuration') || 'null') || structuredClone(DEFAULT_CONFIGURATION);
 let remoteMode = false;
 
 function save() {

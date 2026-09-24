@@ -2,18 +2,43 @@ import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { dirname } from 'node:path';
 import {
+  DEFAULT_CONFIGURATION,
   DEFAULT_PLAYERS,
   absenceReport,
   fairness,
   generateSchedule,
+  isValidDateString,
   normalizeUnavailable,
   validateSchedule
 } from '../src/tennis-core.js';
 
 const clone = value => JSON.parse(JSON.stringify(value));
 
+export function normalizeConfiguration(value) {
+  const base = clone(DEFAULT_CONFIGURATION);
+  return {
+    seasonStart: typeof value?.seasonStart === 'string' ? value.seasonStart : base.seasonStart,
+    seasonEnd: typeof value?.seasonEnd === 'string' ? value.seasonEnd : base.seasonEnd,
+    weekdays: Array.isArray(value?.weekdays) ? value.weekdays.map(Number) : base.weekdays,
+    times: Array.isArray(value?.times) ? value.times.map(String) : base.times,
+    matchDurationMinutes: Number.isFinite(Number(value?.matchDurationMinutes)) ? Number(value.matchDurationMinutes) : base.matchDurationMinutes,
+    matchesPerDay: Number.isFinite(Number(value?.matchesPerDay)) ? Number(value.matchesPerDay) : base.matchesPerDay
+  };
+}
+
+export function validateConfiguration(configuration) {
+  const errors = [];
+  if (!isValidDateString(configuration.seasonStart) || !isValidDateString(configuration.seasonEnd)) errors.push('Saisonbeginn und Saisonende müssen gültige ISO-Daten sein.');
+  if (configuration.seasonStart > configuration.seasonEnd) errors.push('Saisonbeginn muss vor dem Saisonende liegen.');
+  if (!configuration.weekdays.length || configuration.weekdays.some(day => !Number.isInteger(day) || day < 1 || day > 7)) errors.push('Wochentage müssen ganze Zahlen von 1 bis 7 sein.');
+  if (!configuration.times.length || configuration.times.some(time => !/^\d{2}:\d{2}$/.test(time))) errors.push('Spielzeiten müssen im Format HH:MM angegeben werden.');
+  if (!Number.isInteger(configuration.matchesPerDay) || configuration.matchesPerDay < 1 || configuration.matchesPerDay !== configuration.times.length) errors.push('Spiele pro Tag muss der Anzahl der Spielzeiten entsprechen.');
+  if (!Number.isInteger(configuration.matchDurationMinutes) || configuration.matchDurationMinutes < 1) errors.push('Die Spieldauer muss eine positive ganze Zahl sein.');
+  return errors;
+}
+
 export function emptyState() {
-  return { players: clone(DEFAULT_PLAYERS), schedule: [], generatedAt: null };
+  return { players: clone(DEFAULT_PLAYERS), schedule: [], configuration: clone(DEFAULT_CONFIGURATION), generatedAt: null };
 }
 
 function normalizeState(value) {
@@ -21,6 +46,7 @@ function normalizeState(value) {
   return {
     players: Array.isArray(value?.players) && value.players.length ? value.players : base.players,
     schedule: Array.isArray(value?.schedule) ? value.schedule : [],
+    configuration: normalizeConfiguration(value?.configuration),
     generatedAt: typeof value?.generatedAt === 'string' ? value.generatedAt : null
   };
 }
@@ -42,10 +68,12 @@ export async function saveState(file, state) {
 }
 
 export function readModel(state) {
-  const validation = validateSchedule(state.schedule, state.players);
+  const configuration = normalizeConfiguration(state.configuration);
+  const validation = [...validateConfiguration(configuration), ...validateSchedule(state.schedule, state.players, configuration)];
   return {
     players: clone(state.players),
     schedule: clone(state.schedule),
+    configuration,
     analysis: fairness(state.schedule, state.players),
     absences: absenceReport(state.schedule, state.players),
     validation: { valid: validation.length === 0, errors: validation },
@@ -58,7 +86,7 @@ function fail(message, errors = []) {
 }
 
 function validateCandidate(state) {
-  const errors = validateSchedule(state.schedule, state.players);
+  const errors = [...validateConfiguration(state.configuration), ...validateSchedule(state.schedule, state.players, state.configuration)];
   return errors.length ? fail('Die Änderung würde einen ungültigen Spielplan erzeugen.', errors) : { ok: true };
 }
 
@@ -68,8 +96,15 @@ export async function applyOperation(file, operation, input = {}) {
   let result;
 
   if (operation === 'generate_schedule') {
-    next.schedule = generateSchedule(next.players);
+    next.schedule = generateSchedule(next.players, next.configuration);
     next.generatedAt = new Date().toISOString();
+    result = validateCandidate(next);
+    if (!result.ok) return result;
+  } else if (operation === 'update_configuration') {
+    const configuration = normalizeConfiguration(input.configuration);
+    const configurationErrors = validateConfiguration(configuration);
+    if (configurationErrors.length) return fail('Die Planregeln sind ungültig.', configurationErrors);
+    next.configuration = configuration;
     result = validateCandidate(next);
     if (!result.ok) return result;
   } else if (operation === 'update_player') {

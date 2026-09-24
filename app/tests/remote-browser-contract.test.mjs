@@ -35,9 +35,16 @@ try {
   });
   assert.equal(operationResponse.status, 200, 'authenticated schedule generation must be accepted');
   assert.equal((await operationResponse.json()).ok, true);
+  const configurationResponse = await fetch(`http://127.0.0.1:${port}/api/operation`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+    body: JSON.stringify({ operation: 'update_configuration', input: { confirm: true, configuration: { ...state.configuration, matchDurationMinutes: 90 } } })
+  });
+  assert.equal(configurationResponse.status, 200, 'authenticated configuration update must be accepted');
   const persistedResponse = await fetch(`http://127.0.0.1:${port}/api/state`, { headers: { authorization: `Bearer ${token}` } });
   const persisted = await persistedResponse.json();
   assert.equal(persisted.schedule.length, 30, 'authenticated write must be persisted in the shared server authority');
+  assert.equal(persisted.configuration.matchDurationMinutes, 90, 'configuration must be persisted in the shared server authority');
   console.log('PASS remote authority contract: authenticated app API and server share persisted state');
 } finally {
   server.kill('SIGTERM');

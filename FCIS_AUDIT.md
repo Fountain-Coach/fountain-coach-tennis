@@ -19,6 +19,12 @@ Date: 2026-09-24
 
 No unestablished item is claimed as complete by this audit.
 
+## Current implementation slice
+
+- Checked-in feature/persistence inventory: present in Markdown and JSON.
+- Existing server authority now preserves and validates configuration across load, update, generate, and read-back.
+- The JSON file adapter remains transitional; SQLite authority and frontend localStorage cutover are not claimed.
+
 ## Estate-derived controls now adopted
 
 - Effects are classified before mutation; hostname or repository names do not select an operation.

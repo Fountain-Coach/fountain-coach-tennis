@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "fountain-coach.tennis-feature-inventory.v1",
+  "authority": {
+    "browserFallback": "app/src/tennis.js",
+    "domainRules": "app/src/tennis-core.js",
+    "serverService": "app/integration/tennis-service.mjs",
+    "serverEntrypoint": "app/mcp-server.mjs",
+    "currentPersistence": "atomic JSON file selected by TENNIS_STATE_FILE",
+    "futurePersistence": "server-authoritative SQLite"
+  },
+  "localStorageKeys": [
+    "fountain-tennis-players",
+    "fountain-tennis-schedule",
+    "fountain-tennis-configuration"
+  ],
+  "entities": {
+    "player": ["id", "name", "active", "fixedFirst", "fixedLast", "unavailable", "availabilityRules"],
+    "scheduleDay": ["date", "matches"],
+    "match": ["time", "a", "b"],
+    "configuration": ["seasonStart", "seasonEnd", "weekdays", "times", "matchDurationMinutes", "matchesPerDay"],
+    "derived": ["analysis", "absences", "validation", "generatedAt"]
+  },
+  "operations": [
+    "generate_schedule",
+    "reset_schedule",
+    "add_player",
+    "update_player",
+    "update_availability",
+    "update_fixed_time",
+    "update_configuration",
+    "edit_match"
+  ],
+  "deferred": [
+    "sqlite-migrations",
+    "durable-oauth-sessions",
+    "roles-and-admin",
+    "legacy-localStorage-migration",
+    "backup-and-restore",
+    "webkit-acceptance",
+    "hcloud-service-release"
+  ]
+}

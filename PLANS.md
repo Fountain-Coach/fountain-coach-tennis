@@ -47,13 +47,24 @@ Proof gate: `ENVIRONMENT.md` is the root contract; deployment routing names the 
 configuration, private listener, data/backup posture, and rollback target; current app tests and `git diff --check`
 pass; the change is committed and pushed to `main`.
 
-## Next bounded change — inventory and backend seam
+## Current bounded change — inventory and configuration authority seam (2026-09-24)
 
-Capability: produce a checked-in feature/persistence inventory and introduce the smallest server-authoritative
-domain seam without changing user-visible behavior.
+Capability: check in the observed feature/persistence inventory and make the existing server-owned state preserve
+and validate the configuration entity already present in the browser application.
 
-Do not start schema design from guessed PDF examples. First inventory the current application and make the
-implementation map executable.
+Implementation result: add Markdown/JSON inventory artifacts, centralize the observed default configuration, preserve
+configuration in the server state/read model, implement validated update_configuration, and add focused authority
+tests. The JSON file adapter remains transitional; SQLite and frontend cutover are deferred.
+
+Proof gate: inventory review, configuration authority tests, existing API/MCP tests, syntax checks, privacy scan,
+git diff --check, semantic commit, and push to main.
+
+## Next bounded change — normalized SQLite seam
+
+Capability: define and test the normalized SQLite schema and migration boundary from the checked-in feature/persistence
+inventory, without changing user-visible behavior.
+
+Do not add guessed PDF example entities. Use only the checked-in inventory and record any domain expansion.
 
 Proof gate: inventory review, migration/schema tests, API contract tests, unchanged frontend acceptance, privacy scan,
 semantic commit, and push to `main`.

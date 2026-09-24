@@ -11,4 +11,9 @@ The repository starts from the existing tennis application and follows the attac
 | Administration | Not yet implemented | Protected `/admin` with entity CRUD and user/role management |
 | Import/export and operations | Not yet implemented | Validated legacy import, JSON export, backup, restore, integrity checks |
 
-The first implementation slice must inventory the actual entities and browser persistence, define the normalized schema and API, and preserve the current frontend template during incremental migration. No feature may be silently dropped.
+The checked-in inventory is [feature-persistence-inventory.md](feature-persistence-inventory.md), with a machine-readable
+companion at [tennis-feature-inventory.json](../app/scenarios/tennis-feature-inventory.json). The first authority
+slice preserves configuration across the existing server/API/MCP boundary and validates it before persistence.
+
+The next implementation slice may define the normalized SQLite schema and API only after reviewing that inventory.
+No feature may be silently dropped.

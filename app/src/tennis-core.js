@@ -1,6 +1,14 @@
 export const TIMES = ['12:00', '13:00', '14:00', '15:00', '16:00'];
 export const START = '2026-10-03';
 export const END = '2027-04-24';
+export const DEFAULT_CONFIGURATION = Object.freeze({
+  seasonStart: START,
+  seasonEnd: END,
+  weekdays: Object.freeze([7]),
+  times: Object.freeze([...TIMES]),
+  matchDurationMinutes: 60,
+  matchesPerDay: 5
+});
 
 // Public starter data only. Customer data must be supplied through the
 // authenticated application backend after the multi-user migration.
@@ -75,7 +83,7 @@ export function validateSchedule(schedule, players, configuration = { times: TIM
     }
     if (day.matches.length !== (configuration.matchesPerDay || 5)) errors.push(`${day.date}: es müssen genau ${configuration.matchesPerDay || 5} Spiele sein`);
     if (new Set(day.matches.map(match => match.time)).size !== day.matches.length) errors.push(`${day.date}: Spielzeit doppelt belegt`);
-    if (used.length !== 10) errors.push(`${day.date}: genau zehn Einsätze erforderlich`);
+    if (used.length !== (configuration.matchesPerDay || 5) * 2) errors.push(`${day.date}: genau ${(configuration.matchesPerDay || 5) * 2} Einsätze erforderlich`);
     if (available(players, day.date, configuration).length < (configuration.matchesPerDay || 5) * 2) errors.push(`${day.date}: zu wenige verfügbare Spieler (${available(players, day.date, configuration).length})`);
     const first = players.find(player => player.fixedFirst && available([player], day.date, configuration).length);
     const last = players.find(player => player.fixedLast && available([player], day.date, configuration).length);
@@ -109,18 +117,18 @@ export function fairness(schedule, players) {
   };
 }
 
-export function generateSchedule(players = DEFAULT_PLAYERS, configuration = { seasonStart: START, seasonEnd: END, weekdays: [7], times: TIMES }) {
+export function generateSchedule(players = DEFAULT_PLAYERS, configuration = DEFAULT_CONFIGURATION) {
   const schedule = dateRange(configuration.seasonStart, configuration.seasonEnd, configuration.weekdays).map(date => ({ date, matches: configuration.times.map(time => ({ time, a: null, b: null })) }));
   const gameCount = {}, pairCount = {};
   for (const day of schedule) {
     const selected = available(players, day.date, configuration).sort((a, b) => {
       const fixed = player => (player.fixedFirst ? 2 : 0) + (player.fixedLast ? 1 : 0);
       return fixed(b) - fixed(a) || (gameCount[a.id] || 0) - (gameCount[b.id] || 0);
-    }).slice(0, 10);
+    }).slice(0, (configuration.matchesPerDay || 5) * 2);
     const first = selected.find(player => player.fixedFirst);
     const last = selected.find(player => player.fixedLast);
     if (first) day.matches[0].a = first.id;
-    if (last) day.matches[4].b = last.id;
+    if (last && day.matches.at(-1)) day.matches.at(-1).b = last.id;
     const used = new Set([first?.id, last?.id]);
     const remaining = selected.filter(player => !used.has(player.id));
     const put = (match, side, id) => { match[side] = id; used.add(id); gameCount[id] = (gameCount[id] || 0) + 1; };
