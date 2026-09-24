@@ -25,6 +25,26 @@ function profile() {
   return { environment, host, user, key, hostname };
 }
 
+function remoteInspection(p) {
+  if (!p.host || !p.user || !p.key) return { state: 'not-configured' };
+  try {
+    const output = execFileSync('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', '-i', p.key,
+      `${p.user}@${p.host}`, 'set -eu; printf "host=%s\\n" "$(hostname)"; printf "kernel=%s\\n" "$(uname -srm)"; printf "node=%s\\n" "$(command -v node || true)"; printf "caddy=%s\\n" "$(command -v caddy || true)"; printf "listeners=%s\\n" "$(ss -ltnH 2>/dev/null | awk \'{print $4}\' | sort -u | tr "\\n" ",")"; printf "root=%s\\n" "$(df -P / | tail -1)"'], { encoding: 'utf8' }).trim().split('\n');
+    const fields = Object.fromEntries(output.map((line) => { const separator = line.indexOf('='); return [line.slice(0, separator), line.slice(separator + 1)]; }));
+    return {
+      state: 'reachable',
+      hostName: fields.host || null,
+      kernel: fields.kernel || null,
+      node: fields.node || null,
+      caddy: fields.caddy || null,
+      listeners: (fields.listeners || '').split(',').filter(Boolean),
+      rootFilesystem: fields.root || null
+    };
+  } catch (error) {
+    return { state: 'blocked', detail: String(error.message || error).replace(/(identity|secret|token|password|key)[^\n]*/gi, '$1=REDACTED').slice(0, 500) };
+  }
+}
+
 function plan() {
   const revision = git('rev-parse', 'HEAD');
   const branch = git('branch', '--show-current');
@@ -55,6 +75,7 @@ function inspect() {
     workingTreeClean: git('status', '--porcelain').length === 0,
     targetConfigured: Boolean(p.host && p.user && p.key && p.hostname),
     target: { environment, hostConfigured: Boolean(p.host), userConfigured: Boolean(p.user), keyConfigured: Boolean(p.key), hostnameConfigured: Boolean(p.hostname) },
+    remote: remoteInspection(p),
     mutation: 'not-run'
   };
   console.log(JSON.stringify(result, null, 2));

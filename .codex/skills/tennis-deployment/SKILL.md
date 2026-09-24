@@ -16,6 +16,11 @@ node deploy/tennis-deploy.mjs plan --environment staging
 node deploy/tennis-deploy.mjs verify
 ```
 
+When the environment variables for the selected target are present, `inspect` performs a read-only SSH preflight and
+reports the remote hostname, kernel, Node/Caddy availability, listeners, and root capacity. Treat missing Node/Caddy,
+occupied edge ports, unreachable SSH, or a dirty source tree as a readiness failure; do not mutate the host to make an
+inspection pass.
+
 The current slice deliberately fails closed for mutation until a release adapter is configured. Do not bypass that
 boundary with `ssh`, `scp`, `rsync`, copied binaries, ad-hoc Caddy edits, or a new untracked script. Never put SSH
 keys, OAuth values, session secrets, SQLite files, or customer data in the repository or command output.
