@@ -13,6 +13,8 @@ Scope: the public customer-facing tennis application and its implementation plan
 - Public source must contain no participant data, session values, OAuth secrets, runtime state, private backups, or deployment credentials.
 - MCP and ChatGPT connectivity are optional integrations. Repository correctness and core tests must not depend on them.
 - The estate footer claim is preserved verbatim, but it must not be read as a claim that the PDF target, live OAuth, or live MCP connection is complete.
+- `estate-landing/` is a checked-in projection/input for the estate route. It is not an independent publication
+  authority and must not be deployed by copying its directory.
 
 ## Implementation rules
 
@@ -24,6 +26,45 @@ Scope: the public customer-facing tennis application and its implementation plan
 - Keep schema migrations, API authorization, validation, audit fields, and transactions testable offline.
 - Never log secrets, OAuth tokens, session identifiers, or raw private payloads.
 - A claim is only complete when its focused tests and acceptance evidence exist; a plan or generated manifest is not runtime proof.
+
+## Estate-derived operational rules
+
+These rules are portable deployment discipline, not a request to turn the tennis application into an estate runtime:
+
+- Resolve the requested effect and exact target before mutation. A hostname, repository name, or user-facing product
+  name must never select an operation by convention.
+- Keep application source release, estate route publication, DNS/TLS changes, and service installation as separate
+  effects with separate authorities and evidence. Do not use `git push`, a directory copy, a generic static server,
+  GitHub Pages, or a remembered deployment script as proof of deployment.
+- For any future live app deployment, require a typed deployment plan, one explicit source revision, exact host and
+  release scope, opaque SecretStore references, capacity/readiness checks, one active operation, a typed terminal
+  receipt, remote health/read-back, content or artifact digest, and rollback evidence.
+- Silence, stdout, process existence, elapsed time, HTTP 200, or a screenshot alone is never completion evidence.
+- DNS, TLS identity, service readiness, application acceptance, and estate publication are distinct witnesses and must
+  be reported separately.
+- A missing native service-release adapter is a bounded blocker. Do not replace it with direct SSH mutation, rsync,
+  copied binaries, ad-hoc Caddy edits, or a new generic deployment script.
+
+## Web acceptance authority
+
+- Functional browser smoke tests may use the repository's existing test tooling.
+- Acceptance of user-facing semantics and responsive presentation must use a native Swift/WebKit lane with the
+  accessibility/DOM tree as semantic authority and fixed-viewport snapshots as visual authority.
+- Use accessible roles, names, values, states, and actions; coordinate clicks and screenshot-only inspection are not
+  acceptance evidence.
+- For the estate landing projection, additionally use the native FountainStore/EstatePublisher preview lease when
+  that estate surface is being accepted. The tennis application itself does not require Reframe or FountainStore for
+  ordinary development.
+
+## Estate-only rules that do not transfer
+
+- `estate.publication.sync`, Store-to-Store publication, and the `estate-domain-publication` instrument govern
+  estate route publication only, not tennis players, schedules, sessions, or application API data.
+- Governance chapter numbering, the seven-link estate navigation, Personal Pointer shell, and estate icon contracts
+  apply only to admitted estate routes.
+- Reframe launch, MIDI2 readiness, FountainStore leases, and EstatePublisher are not prerequisites for ordinary
+  tennis backend or frontend development. They become required only when the named estate projection or an admitted
+  deployment adapter is being exercised.
 
 ## FCIS surfaces
 

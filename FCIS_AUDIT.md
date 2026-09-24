@@ -18,3 +18,14 @@ Date: 2026-09-24
 - Production deployment, live GitHub OAuth, or live ChatGPT/MCP connectivity.
 
 No unestablished item is claimed as complete by this audit.
+
+## Estate-derived controls now adopted
+
+- Effects are classified before mutation; hostname or repository names do not select an operation.
+- Application release, estate route publication, DNS/TLS, and service installation have separate authorities and
+  witnesses.
+- Future admitted mutations require opaque credentials, one active process, typed terminal receipts, read-back,
+  digests, and rollback evidence.
+- WebKit accessibility/DOM semantics and fixed-viewport snapshots are the user-facing acceptance authorities.
+- Estate-only Store publication, Reframe/FountainStore prerequisites, Governance numbering, and estate shell rules
+  remain explicitly fenced from ordinary tennis development.

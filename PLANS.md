@@ -18,6 +18,20 @@ Proof gate for this slice:
 - existing focused application tests still pass;
 - the semantic commit is pushed to `main`.
 
+## Current bounded change — transfer estate operating discipline without estate authority (2026-09-24)
+
+Capability: make future tennis deployment and web acceptance fail closed at the correct boundary while reusing
+EstatePublisher's portable discipline: typed target/scope, opaque credentials, one active operation, terminal
+receipt, read-back/digest/rollback, and separate DNS/TLS/service witnesses.
+
+Explicit non-transfer: Store-to-Store estate publication, Reframe/FountainStore prerequisites, Governance numbering,
+estate navigation/icon rules, and the `estate-domain-publication` instrument remain estate-only. The tennis repository
+has no admitted native service-release adapter; a live service deployment must stop at that seam until one is added.
+
+Proof gate: the updated `AGENTS.md` and tennis skill classify application work, estate publication, service release,
+infrastructure verification, and WebKit AX/VRT acceptance; focused app tests, privacy checks, and `git diff --check`
+pass; the change is committed and pushed to `main`.
+
 ## Next bounded change — inventory and backend seam
 
 Capability: produce a checked-in feature/persistence inventory and introduce the smallest server-authoritative
