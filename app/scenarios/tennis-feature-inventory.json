@@ -28,7 +28,8 @@
     "update_availability",
     "update_fixed_time",
     "update_configuration",
-    "edit_match"
+    "edit_match",
+    "import_state"
   ],
   "deferred": [
     "durable-oauth-sessions",

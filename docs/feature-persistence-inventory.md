@@ -62,6 +62,7 @@ authoritative entities.
 | update_fixed_time | /api/operation, tennis_update_fixed_time | Changes first/last fixed slot | Slot/type validation and full-plan validation |
 | update_configuration | /api/operation; browser remote mode | Changes season rules | Configuration shape and full-plan validation |
 | edit_match | /api/operation, tennis_edit_match | Changes match players | Match existence and full-plan validation |
+| import_state | /api/operation, authenticated browser import | Explicitly replaces server state with a validated local snapshot | Object/array shape and full-plan validation |
 
 ## Gaps intentionally deferred
 

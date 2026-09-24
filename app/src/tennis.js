@@ -7,9 +7,13 @@ document.body.classList.toggle('app-mode', appMode);
 
 const $ = selector => document.querySelector(selector);
 const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
-let players = JSON.parse(localStorage.getItem('fountain-tennis-players') || 'null') || structuredClone(DEFAULT_PLAYERS);
-let schedule = JSON.parse(localStorage.getItem('fountain-tennis-schedule') || 'null') || [];
-let configuration = JSON.parse(localStorage.getItem('fountain-tennis-configuration') || 'null') || structuredClone(DEFAULT_CONFIGURATION);
+const localSnapshot = () => ({
+  players: JSON.parse(localStorage.getItem('fountain-tennis-players') || 'null') || structuredClone(DEFAULT_PLAYERS),
+  schedule: JSON.parse(localStorage.getItem('fountain-tennis-schedule') || 'null') || [],
+  configuration: JSON.parse(localStorage.getItem('fountain-tennis-configuration') || 'null') || structuredClone(DEFAULT_CONFIGURATION),
+  generatedAt: null
+});
+let { players, schedule, configuration } = localSnapshot();
 let remoteMode = false;
 
 function save() {
@@ -25,6 +29,10 @@ function useRemoteModel(model) {
   configuration = state.configuration || configuration;
 }
 
+function hasLocalSnapshot() {
+  return ['fountain-tennis-players', 'fountain-tennis-schedule', 'fountain-tennis-configuration'].some(key => localStorage.getItem(key) !== null);
+}
+
 async function connectRemote() {
   try {
     const response = await fetch('/auth/session', { credentials: 'same-origin', headers: { Accept: 'application/json' } });
@@ -35,6 +43,7 @@ async function connectRemote() {
     if (!stateResponse.ok) throw new Error('Geschützter Spielplan ist nicht erreichbar.');
     useRemoteModel(await stateResponse.json());
     remoteMode = true;
+    $('#import-local').hidden = false;
     $('#connection').textContent = 'ANGEMELDET · gemeinsamer Spielplan';
     render();
     toast('Online-Spielplan verbunden.');
@@ -56,6 +65,7 @@ async function enforceAppGate() {
     if (!stateResponse.ok) throw new Error('Geschützter Spielplan ist nicht erreichbar.');
     useRemoteModel(await stateResponse.json());
     remoteMode = true;
+    $('#import-local').hidden = false;
     $('#connection').textContent = 'ANGEMELDET · gemeinsamer Spielplan';
     dashboard.removeAttribute('aria-hidden');
     gate.hidden = true;
@@ -66,21 +76,13 @@ async function enforceAppGate() {
 }
 
 async function remoteOperation(operation, input) {
-  const operationMap = { generate_schedule: 'schedule.generate', reset_schedule: 'schedule.reset', add_player: 'player.add', update_player: 'player.update', update_fixed_time: 'player.update', update_availability: 'availability.update', update_configuration: 'configuration.update', edit_match: 'match.update' };
-  const nativeOperation = operationMap[operation];
-  if (!nativeOperation) throw new Error(`Unbekannte Online-Operation: ${operation}`);
-  const payload = { ...input };
-  delete payload.confirm;
-  if (operation === 'update_fixed_time') { payload[input.slot === 'first' ? 'fixedFirst' : 'fixedLast'] = String(input.enabled); delete payload.slot; delete payload.enabled; }
-  for (const [key, value] of Object.entries(payload)) if (Array.isArray(value) || typeof value === 'object') payload[key] = JSON.stringify(value);
-  const mutating = nativeOperation !== 'schedule.query';
-  const request = { operation: nativeOperation, tenantID: 'tennis.fountain.coach', userID: 'browser-session', correlationID: crypto.randomUUID(), idempotencyKey: mutating ? crypto.randomUUID() : undefined, confirmation: Boolean(input.confirm), payload };
+  const request = { operation, input: { ...input, confirm: true } };
   const response = await fetch('/api/operation', {
     method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ topic: 'fountainstore/tennis.schedule.mutate', request })
+    body: JSON.stringify(request)
   });
   const result = await response.json();
-  if (!response.ok || result.error || result.lifecycle === 'failed') throw new Error(result.errors?.[0] || result.message || result.error || 'Online-Änderung abgelehnt.');
+  if (!response.ok || !result.ok) throw new Error(result.errors?.[0] || result.message || result.error || 'Online-Änderung abgelehnt.');
   useRemoteModel(result);
   render();
 }
@@ -95,6 +97,7 @@ function render() {
 }
 
 function renderConfiguration() {
+  if (!$('#configuration-form')) return;
   $('#configuration-start').value = configuration.seasonStart || '';
   $('#configuration-end').value = configuration.seasonEnd || '';
   $('#configuration-weekdays').value = (configuration.weekdays || []).join(', ');
@@ -145,6 +148,12 @@ function toast(message, isError = false) { const node = $('#toast'); node.textCo
 document.addEventListener('click', event => {
   if (event.target.matches('[data-tab]')) { document.querySelectorAll('.tab,.panel').forEach(node => node.classList.remove('active')); event.target.classList.add('active'); $(`#${event.target.dataset.tab}`).classList.add('active'); }
   if (event.target.id === 'connect') { connectRemote(); }
+  if (event.target.id === 'import-local') {
+    if (!remoteMode) return;
+    if (!hasLocalSnapshot()) { toast('Keine lokalen Tennisdaten zum Importieren gefunden.', true); return; }
+    if (!confirm('Lokale Tennisdaten in den gemeinsamen Spielplan importieren? Vorhandene Online-Daten werden ersetzt.')) return;
+    remoteOperation('import_state', { confirm: true, state: localSnapshot() }).then(() => toast('Lokale Daten importiert.')).catch(error => toast(error.message, true));
+  }
   if (event.target.id === 'generate') {
     if (remoteMode) { remoteOperation('generate_schedule', { confirm: true }).then(() => toast('Spielplan online erzeugt.')).catch(error => toast(error.message, true)); return; }
     schedule = generateSchedule(players, configuration); save(); render(); toast(errors().length ? `Plan erzeugt, aber nicht vollständig gültig: ${errors()[0]}` : 'Spielplan erzeugt.');
@@ -176,7 +185,7 @@ document.addEventListener('click', event => {
   }
 });
 
-$('#configuration-form').addEventListener('submit', async event => {
+$('#configuration-form')?.addEventListener('submit', async event => {
   event.preventDefault();
   const next = {
     seasonStart: $('#configuration-start').value,

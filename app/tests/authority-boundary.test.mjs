@@ -33,6 +33,16 @@ try {
   assert.deepEqual((await loadState(stateFile)).configuration.times, ['09:00', '10:30', '12:00', '13:30', '15:00']);
 
   assert.equal((await applyOperation(stateFile, 'reset_schedule')).ok, true);
+  const imported = await applyOperation(stateFile, 'import_state', {
+    state: {
+      players: initial.players,
+      schedule: [],
+      configuration: initial.configuration,
+      generatedAt: null
+    }
+  });
+  assert.equal(imported.ok, true);
+  assert.equal((await loadState(stateFile)).players.length, initial.players.length);
   const compact = await applyOperation(stateFile, 'update_configuration', {
     configuration: {
       seasonStart: '2026-10-03',

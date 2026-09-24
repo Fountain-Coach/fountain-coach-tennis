@@ -106,6 +106,17 @@ export function applyStateOperation(state, operation, input = {}) {
     next.configuration = configuration;
     result = validateCandidate(next);
     if (!result.ok) return result;
+  } else if (operation === 'import_state') {
+    const imported = input.state;
+    if (!imported || typeof imported !== 'object' || Array.isArray(imported) || !Array.isArray(imported.players) || !Array.isArray(imported.schedule)) {
+      return fail('Der zu importierende lokale Spielstand ist ungültig.');
+    }
+    next.players = clone(imported.players);
+    next.schedule = clone(imported.schedule);
+    next.configuration = normalizeConfiguration(imported.configuration);
+    next.generatedAt = typeof imported.generatedAt === 'string' ? imported.generatedAt : null;
+    result = validateCandidate(next);
+    if (!result.ok) return result;
   } else if (operation === 'update_player') {
     const player = next.players.find(item => item.id === input.playerId);
     if (!player) return fail(`Unbekannter Spieler: ${input.playerId}`);
@@ -132,6 +143,10 @@ export function applyStateOperation(state, operation, input = {}) {
     const normalized = normalizeUnavailable(input.unavailable.join(','));
     if (normalized.invalid.length) return fail('Mindestens ein Datum ist ungültig.', normalized.invalid);
     player.unavailable = normalized.values;
+    if (input.rules !== undefined) {
+      if (!Array.isArray(input.rules)) return fail('rules muss ein Array von Verfügbarkeitsregeln sein.');
+      player.availabilityRules = clone(input.rules);
+    }
     result = validateCandidate(next);
     if (!result.ok) return result;
   } else if (operation === 'update_fixed_time') {

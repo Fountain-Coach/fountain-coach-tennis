@@ -78,10 +78,26 @@ example entities were introduced.
 Proof: SQLite migration/round-trip/rejection tests pass; the authenticated remote API contract runs against SQLite;
 the existing JSON MCP contract and frontend source remain unchanged in behavior; privacy scan and diff checks pass.
 
-## Next bounded change — browser authority cutover
+## Current bounded change — browser authority cutover
 
 Capability: move authenticated application reads and writes from browser localStorage to the server authority while
 preserving the current UI and retaining an explicit, auditable import path for existing local browser data.
 
 Do not delete localStorage data or claim migration success until an explicit import, duplicate/replay policy, and
 WebKit semantic acceptance are implemented.
+
+Implementation result: authenticated application reads continue from `/api/state`, all authenticated browser writes
+now use the direct `/api/operation` contract, and localStorage is no longer written after the server authority is
+admitted. A user-triggered `import_state` action provides the explicit replacement path for an existing local
+snapshot; it never runs automatically and requires the normal confirmation boundary. The missing optional
+configuration form is guarded so the current UI does not fail during this transition.
+
+Proof: browser source contract, import/authority tests, core tests, MCP contract, remote API contract, syntax checks,
+privacy scan, diff check, semantic commit, and push to `main`.
+
+## Next bounded change — durable identity and role boundary
+
+Capability: replace process-local OAuth sessions and grants with durable, secure session state and enforce local
+application roles at the backend boundary before adding administrative UI.
+
+WebKit semantic acceptance and HCloud service release remain separate gates.

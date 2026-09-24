@@ -25,6 +25,8 @@ No unestablished item is claimed as complete by this audit.
 - Existing server authority now preserves and validates configuration across load, update, generate, and read-back.
 - A normalized SQLite schema/migration boundary is implemented and selectable with `TENNIS_STATE_BACKEND=sqlite`.
 - The JSON file adapter remains the default transition backend; frontend localStorage cutover is not claimed.
+- Authenticated browser writes now use the direct server operation contract; localStorage remains read-only fallback
+  state and is importable only through an explicit confirmed `import_state` action.
 
 ## Estate-derived controls now adopted
 

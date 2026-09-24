@@ -27,3 +27,10 @@ players, unavailability, availability rules, schedule days, matches, configurati
 keys, WAL mode, transactional writes, idempotent migration, and an explicit `TENNIS_STATE_BACKEND=sqlite` selector
 were added. JSON remains the default transition backend. No PDF-only example entity was introduced, and frontend
 localStorage remains unchanged for the next browser authority-cutover slice.
+
+## Follow-on browser cutover seam
+
+The browser already fetched `/api/state` after an admitted session, but its write helper still constructed an obsolete
+native-bridge-shaped payload and localStorage remained the implicit fallback. The cutover uses the existing direct
+API contract, stops local writes after remote admission, and adds one explicit confirmed import operation for a local
+snapshot. Automatic merge or deletion is intentionally not introduced.
