@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Privater Tennis-Spielplan.">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Tennisrunde · App</title>
+  <link rel="stylesheet" href="src/styles.css">
+  <link rel="stylesheet" href="src/landing.css">
+  <link rel="stylesheet" href="src/linotype-utility.css">
+</head>
+<body class="app-mode">
+  <div class="dashboard-shell">
+    <header class="topbar"><div class="topbar-identity"><div class="brand"><span class="tennisball-logo" role="img" aria-label="Tennisball"></span></div><span id="connection" class="connection" role="status">NICHT ANGEMELDET</span></div></header>
+    <div class="action-row"><div class="top-actions"><button id="generate" class="primary">Spielplan erzeugen</button><button id="export">Excel exportieren</button><button id="reset" class="quiet">Zurücksetzen</button></div></div>
+  <main><h1 class="sr-only">Fountain Coach Tennisrunde</h1><section class="summary" aria-labelledby="summary-title"><div><p id="season-label" class="kicker">SAISON 2026/27</p><h2 id="summary-title">Dein Spielplan auf einen Blick</h2><p id="status" role="status">Noch kein Spielplan erzeugt.</p></div><div id="metrics" class="metrics"></div></section><nav class="tabs" aria-label="Hauptnavigation"><button class="tab active" data-tab="schedule">Spielplan</button><button class="tab" data-tab="players">Spieler</button><button class="tab" data-tab="analysis">Auswertung</button></nav><section id="schedule" class="panel active" aria-labelledby="schedule-title"><div class="toolbar"><div><h2 id="schedule-title">Spieltage</h2><p id="season-range" class="muted">Samstags · 03.10.2026 – 24.04.2027</p></div><div class="filters"><label>Spieler <select id="player-filter"><option value="">Alle</option></select></label><label>Datum <select id="date-filter"><option value="">Alle Spieltage</option></select></label></div></div><div id="schedule-list" class="schedule-list"></div></section><section id="players" class="panel" aria-labelledby="players-title"><div class="toolbar"><div><h2 id="players-title">Spielerverwaltung</h2><p class="muted">Namen, Aktivität und flexible Verfügbarkeit bearbeiten.</p></div><button id="add-player">Spieler hinzufügen</button></div><section class="editor-card" aria-labelledby="configuration-title"><div class="editor-heading"><div><p class="kicker">PLANREGELN</p><h3 id="configuration-title">Spielplan-Konfiguration</h3><p class="muted">Diese Werte werden im gemeinsamen Store gespeichert und beim Erzeugen verwendet.</p></div></div><form id="configuration-form" class="configuration-form"><label>Beginn<input id="configuration-start" type="date" required></label><label>Ende<input id="configuration-end" type="date" required></label><label>Wochentage<input id="configuration-weekdays" type="text" placeholder="6, 7" aria-describedby="configuration-help" required></label><label>Spielzeiten<input id="configuration-times" type="text" placeholder="12:00, 13:00" required></label><label>Spiele pro Tag<input id="configuration-matches" type="number" min="1" required></label><label>Spieldauer (Minuten)<input id="configuration-duration" type="number" min="1" required></label><div class="form-actions"><button class="primary" type="submit">Planregeln speichern</button><span id="configuration-help" class="input-help">Wochentage: 1 = Sonntag, 7 = Samstag.</span></div></form></section><div id="players-list" class="players-list"></div></section><section id="analysis" class="panel" aria-labelledby="analysis-title"><h2 id="analysis-title">Auswertung</h2><div id="analysis-content" class="analysis-grid"></div></section></main>
+  </div>
+  <section id="auth-gate" class="auth-gate" aria-labelledby="auth-gate-title" hidden><div class="auth-gate-card"><p class="kicker">PRIVATER ZUGANG</p><h2 id="auth-gate-title">Bitte anmelden</h2><p id="auth-gate-message">Der Spielplan ist nur für angemeldete Mitglieder erreichbar.</p><a id="auth-gate-login" class="primary auth-gate-button" href="/auth/login">Mit dem Anbieter anmelden <span aria-hidden="true">↗</span></a></div></section>
+  <div id="toast" class="toast" role="alert" hidden></div>
+  <script src="assets/fflate.js"></script><script type="module" src="src/tennis.js"></script>
+</body>
+</html>

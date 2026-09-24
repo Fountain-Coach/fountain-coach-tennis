@@ -1,0 +1,36 @@
+# Fountain Coach Tennisrunde
+
+This public repository is the privacy-scrubbed initial customer-facing snapshot of the `tennis.fountain.coach` subdomain.
+
+It contains the current tennis landing page, browser application, scheduling rules, MCP/OAuth integration seam, tests, and the estate landing projection. The starter model uses generic player labels; no participant names, availability dates, runtime state, credentials, tokens, or generated private artifacts are included.
+
+## Current status
+
+The initial snapshot is a feature-complete single-browser/static-preview application. Browser `localStorage` remains its current persistence mode. It is not yet the completed multi-user production application.
+
+The attached implementation prompt is treated as the target specification for the next phases: server-authoritative SQLite, GitHub identity, local application roles, protected `/admin`, full domain CRUD, migration/import/export, auditability, backup/restore, multi-user tests, and independently reproducible deployment. See [docs/implementation-map.md](docs/implementation-map.md).
+
+## Run locally
+
+```sh
+npm ci --prefix app
+npm test --prefix app
+npm run test:e2e --prefix app
+```
+
+The current static preview is:
+
+```sh
+node app/preview.mjs
+```
+
+This is development-only. Configure a real HTTPS deployment, server-side state, OAuth, and operational controls before using customer data.
+
+## Privacy and ownership
+
+- [PRIVACY.md](PRIVACY.md) records what was removed from this public seed and what remains to be implemented.
+- [SECURITY.md](app/SECURITY.md) describes the current security boundary and unresolved production requirements.
+- [docs/footer-claim.md](docs/footer-claim.md) preserves the estate footer claim verbatim and explains its scope.
+- OAuth client values, session secrets, bearer tokens, player data, and deployment credentials belong in the operator's secret/configuration systems, never in Git.
+
+GitHub identifies a person; the Tennis application must own its local account, role, and authorization. Repository ownership and hosting administration remain separate authority domains.

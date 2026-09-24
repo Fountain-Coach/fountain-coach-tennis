@@ -1,0 +1,35 @@
+# Fountain Coach Tennisrunde
+
+Diese URL beschreibt eine Tennis-Spielplan-App in deutscher Sprache.
+
+## Lesbare Informationen
+
+Die App kann Spieltage, Spieler, Abwesenheiten, Fixzeiten, Begegnungen, Fairnesswerte und Validierungszustände
+anzeigen. Der Nutzer muss den Spielplan im Browser erzeugen, bevor lokale Spielplandaten vorhanden sind.
+
+## Aktionsgrenze
+
+Diese URL erteilt ChatGPT keine Schreibberechtigung. Für Fragen kann ein authentifizierter Read-Endpunkt genutzt
+werden. Änderungen durch ChatGPT laufen ausschließlich über den authentifizierten MCP-Endpunkt und dessen von
+ChatGPT angezeigte Bestätigungsschranke.
+
+## Integration
+
+Discovery: `/.well-known/fountain-coach-tennis.json`
+Human entry point: `/`
+MCP endpoint: `/mcp` (Streamable HTTP)
+Read API: `/api/state` (Bearer authentication)
+Current status: MCP core implemented and contract-tested; public HTTPS deployment and ChatGPT connection not verified.
+
+## ChatGPT connection
+
+In ChatGPT Developer Mode, add the deployed HTTPS MCP endpoint, for example `https://example.invalid/mcp`, as a
+Custom App. The app must be served over HTTPS and configured with the MCP OAuth authorization-code flow (PKCE,
+dynamic client registration, explicit admin consent and refresh tokens). The admin identity must be listed in
+`TENNIS_ADMIN_EMAILS` or `OAUTH_ADMIN_EMAILS`. A static bearer credential remains only an owner-approved compatibility
+lane. Mutating tool calls require the `tennis.write` scope and `confirm: true`; the user must approve the mutation at
+the ChatGPT boundary before that flag is sent. The URL of the human web app is not itself an action endpoint.
+
+The configured upstream provider may be GitHub (`OAUTH_IDP=github`, `GITHUB_OAUTH_CLIENT_ID`,
+`GITHUB_OAUTH_CLIENT_SECRET`, `GITHUB_OAUTH_REDIRECT_URI`), Google, or Apple. GitHub identities are admitted only
+when the provider returns a verified email present in the admin allowlist.

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "fountain-coach.tennis.chatgpt-discovery.v1",
+  "name": "Fountain Coach Tennisrunde",
+  "description": "Maschinenlesbare Planung einer regelmäßigen Tennis-Spielrunde.",
+  "language": "de",
+  "publicUrl": "https://REPLACE_WITH_DEPLOYED_HOST/",
+  "integrationStatus": "read-discovery-ready-mcp-core-ready-public-deployment-not-verified",
+  "dataAuthority": "server-persisted-state-file-configured-by-TENNIS_STATE_FILE; browser-local-storage remains the static-preview mode",
+  "readCapabilities": ["schedule", "players", "availability", "fairness", "validation"],
+  "writeCapabilities": ["generate_schedule", "update_player", "update_availability", "update_fixed_time", "edit_match", "reset_schedule"],
+  "writePolicy": "tennis.write scope plus ChatGPT confirmation and server-side confirm: true",
+  "requiredNextIntegration": "provider-and-admin-configuration-followed-by-remote-acceptance",
+  "mcpEndpoint": "/mcp",
+  "mcpTransport": "Streamable HTTP",
+  "mcpAuthentication": "OAuth authorization-code + PKCE with refresh tokens; GitHub, Google, or Apple upstream; static bearer remains an owner-only compatibility lane",
+  "notes": [
+    "A URL makes the public discovery contract addressable; it does not grant ChatGPT permission to modify data. The MCP endpoint must be connected as a Custom App in ChatGPT.",
+    "OAuth admits only identities listed in TENNIS_ADMIN_EMAILS or OAUTH_ADMIN_EMAILS and requires explicit consent.",
+    "Write actions require tennis.write, an authenticated MCP app and user confirmation at the ChatGPT integration boundary.",
+    "Replace publicUrl during the owner-approved HTTPS deployment phase."
+  ],
+  "humanEntryPoint": "/",
+  "machineReadme": "/chatgpt.txt"
+}

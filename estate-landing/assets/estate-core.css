@@ -1,0 +1,525 @@
+:root {
+  color-scheme: light dark;
+  --estate-ink: #27231f;
+  --estate-muted: #706a60;
+  --estate-line: #d5cec2;
+  --estate-paper: #f3efe7;
+  --estate-panel: #fbfaf6;
+  --estate-rail: #e8e3d9;
+  --estate-soft: #e7e1d5;
+  --estate-accent: #7b6643;
+  --estate-signal: #a45d43;
+  --estate-shadow: 0 1.1rem 2.8rem rgb(61 52 40 / .1);
+  --estate-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --estate-text: Charter, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --estate-utility: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --estate-mono: "SF Mono", "Courier New", ui-monospace, Menlo, Consolas, monospace;
+  --ink: var(--estate-ink);
+  --muted: var(--estate-muted);
+  --line: var(--estate-line);
+  --paper: var(--estate-paper);
+  --panel: var(--estate-panel);
+  --rail: var(--estate-rail);
+  --soft: var(--estate-soft);
+  --accent: var(--estate-accent);
+  --shadow: var(--estate-shadow);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --estate-ink: #ece7dc;
+  --estate-muted: #b6aea1;
+  --estate-line: #4a463f;
+  --estate-paper: #1d1b18;
+  --estate-panel: #28251f;
+  --estate-rail: #24211d;
+  --estate-soft: #353129;
+  --estate-accent: #d1a85f;
+  --estate-signal: #c58067;
+  --estate-shadow: 0 1.1rem 2.8rem rgb(0 0 0 / .28);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --estate-ink: #ece7dc;
+    --estate-muted: #b6aea1;
+    --estate-line: #4a463f;
+    --estate-paper: #1d1b18;
+    --estate-panel: #28251f;
+    --estate-rail: #24211d;
+    --estate-soft: #353129;
+    --estate-accent: #d1a85f;
+    --estate-signal: #c58067;
+    --estate-shadow: 0 1.1rem 2.8rem rgb(0 0 0 / .28);
+  }
+  :root:not([data-theme="light"]) .estate-nav .estate-home-mark { filter: invert(1); }
+}
+
+* { box-sizing: border-box; }
+html { background: var(--estate-paper); scroll-behavior: smooth; overflow-x: hidden; }
+:where(#main, [id]) { scroll-margin-top: clamp(5rem, 12vw, 8rem); }
+body {
+  margin: 0;
+  overflow-x: clip;
+  background: var(--estate-paper) !important;
+  color: var(--estate-ink) !important;
+  font-family: var(--estate-text) !important;
+  line-height: 1.62;
+}
+a { color: var(--estate-accent); text-underline-offset: .18em; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--estate-signal); outline-offset: 3px; }
+.skip-link { position: fixed !important; top: -5rem !important; left: 1rem !important; z-index: 1000 !important; padding: .65rem 1rem !important; background: var(--estate-ink) !important; color: var(--estate-paper) !important; }
+.skip-link:focus { top: 1rem !important; }
+
+:where(.site-header, .topbar, header[role="banner"]) {
+  position: sticky !important;
+  inset-block-start: 0;
+  z-index: 50;
+  width: 100%;
+  height: auto !important;
+  min-height: 5.25rem;
+  display: block !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  padding: .8rem clamp(1rem, 3vw, 2.4rem) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--estate-line) !important;
+  background: transparent !important;
+  color: var(--estate-ink) !important;
+  backdrop-filter: none;
+  box-shadow: none !important;
+  transition: background-color .2s ease, box-shadow .2s ease, backdrop-filter .2s ease;
+}
+:where(.site-header, .topbar, header[role="banner"])[data-scroll-state="scrolled"] {
+  background: color-mix(in srgb, var(--estate-paper) 78%, transparent) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 .35rem 1rem rgb(61 52 40 / .08) !important;
+}
+/* Newspaper Template: every estate identity shares one readable vertical order:
+   logo line → button rail → breadcrumb-led content. */
+:where(.site-header, .topbar, header[role="banner"]) {
+  display: block !important;
+}
+:where(.site-header, .topbar, header[role="banner"]) :where(.nav-shell, .nav) {
+  display: block !important;
+}
+:where(.site-header, .topbar, header[role="banner"]) :where(.nav-shell, .nav) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+:where(.brand, .wordmark) {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .8rem !important;
+  min-width: 13rem;
+  color: var(--estate-ink) !important;
+  text-decoration: none !important;
+}
+:where(.site-header, .topbar, header[role="banner"]) :where(.brand, .wordmark) {
+  width: 100%;
+  min-width: 0;
+}
+:where(.brand, .wordmark) :where(img, .brand-logo, .wordmark-logo, .brand-mark, .mark) {
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  flex: 0 0 2.75rem;
+  object-fit: contain;
+  border: 0 !important;
+  border-radius: .35rem;
+  background: transparent !important;
+}
+:where(.brand, .wordmark) strong,
+.brand > span,
+.wordmark > span { color: var(--estate-ink) !important; font-size: .82rem !important; font-weight: 700 !important; letter-spacing: .08em; }
+:where(.brand, .wordmark) small,
+.brand div > span { display: block; margin-top: .1rem; color: var(--estate-muted) !important; font-size: .67rem !important; font-weight: 400 !important; letter-spacing: .03em; }
+
+.estate-nav {
+  order: initial !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: .2rem .45rem !important;
+  min-width: 0;
+  width: 100% !important;
+  margin: .7rem 0 0 !important;
+  padding: .65rem 0 0 !important;
+  border: 0 !important;
+  border-top: 1px solid var(--estate-line) !important;
+  background: transparent !important;
+}
+.estate-nav .estate-separator { display: none !important; }
+.estate-nav :where(a, button) {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .28rem !important;
+  min-width: 0;
+  padding: .38rem .46rem !important;
+  border: 1px solid transparent !important;
+  border-radius: .45rem !important;
+  background: transparent !important;
+  color: var(--estate-muted) !important;
+  font: inherit !important;
+  cursor: pointer;
+  font-size: .72rem !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+}
+.estate-nav :where(a, button):focus-visible { outline: 2px solid var(--estate-accent) !important; outline-offset: 3px; }
+.estate-nav a[aria-current="page"] { border-color: var(--estate-accent) !important; background: transparent !important; color: var(--estate-ink) !important; }
+.estate-nav .estate-info { appearance: none; -webkit-appearance: none; }
+.estate-nav svg { width: 1.05rem !important; height: 1.05rem !important; flex: 0 0 1.05rem; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+.estate-nav .estate-symbol { display: block; width: 1.05rem !important; height: 1.05rem !important; flex: 0 0 1.05rem; }
+.estate-nav .estate-icon span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.estate-nav .estate-icon { justify-content: center; width: 2.75rem !important; min-width: 2.75rem !important; min-height: 2.75rem !important; padding-inline: .45rem !important; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+@media (hover: hover) {
+  .estate-nav :where(a, button):hover { border-color: var(--estate-line) !important; background: transparent !important; color: var(--estate-accent) !important; }
+}
+
+:where(.header-actions, .topbar-actions) { display: flex !important; align-items: center !important; gap: .55rem !important; margin: 0 !important; }
+:where(.theme-button, .theme-toggle, .menu-button, .nav-toggle, .icon-only-toggle, header button, header .estate-link, header .agent-link) {
+  min-height: 2.45rem;
+  padding: .48rem .68rem !important;
+  border: 1px solid var(--estate-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--estate-ink) !important;
+  font: inherit !important;
+  font-size: .7rem !important;
+  line-height: 1.2 !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+}
+:where(.site-rail, .chapter-rail, aside.sidebar, .reading-index) {
+  border-color: var(--estate-line) !important;
+  background: transparent !important;
+  color: var(--estate-muted) !important;
+}
+:where(.site-rail, .chapter-rail, aside.sidebar, .reading-index) a { color: var(--estate-muted) !important; }
+:where(.site-rail, .chapter-rail, aside.sidebar, .reading-index) a[aria-current="page"],
+:where(.site-rail, .chapter-rail, aside.sidebar, .reading-index) a.active { color: var(--estate-accent) !important; border-color: var(--estate-accent) !important; background: transparent !important; }
+
+main { min-width: 0; color: var(--estate-ink); }
+main h1, main h2, main h3 {
+  max-width: 100%;
+  color: var(--estate-ink) !important;
+  font-family: var(--estate-display) !important;
+  font-weight: 600 !important;
+  line-height: 1.05 !important;
+  letter-spacing: -.018em !important;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  overflow-wrap: anywhere;
+}
+main h1 { max-width: 24ch !important; font-size: clamp(2.8rem, 5.4vw, 5rem) !important; }
+main h2 { max-width: 32ch !important; font-size: clamp(1.7rem, 3.1vw, 2.7rem) !important; }
+main h3 { max-width: 36ch !important; font-size: clamp(1.2rem, 1.8vw, 1.65rem) !important; }
+:where(main, .site-layout, .workspace, .chapter-canvas, .page) :where(p, li, td, th, dd, figcaption, blockquote) {
+  font-family: var(--estate-text) !important;
+  font-size: 1rem;
+  line-height: 1.58;
+  letter-spacing: normal;
+  font-variant-numeric: proportional-nums;
+}
+:where(main, .site-layout, .workspace, .chapter-canvas, .page) :where(p, li, dd, blockquote) { max-width: 68ch; }
+:where(.eyebrow, .section-kicker, .section-label, .rail-label, .canvas-kicker, .card-topline, .kicker) {
+  color: var(--estate-muted) !important;
+  font-family: var(--estate-utility) !important;
+  font-size: .68rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .15em !important;
+  text-transform: uppercase;
+}
+:where(.lead, .lede, .muted) { color: var(--estate-muted) !important; }
+:where(.card, .chapter-card, .concept-card, .authority-card, .domain-card, .status-card, .fact-card, .entry-card, .evidence-card, .callout, blockquote, .status-panel, .brand-card, .lineage-card, .agent-mark, .proposal-callout) {
+  border-color: var(--estate-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--estate-ink) !important;
+  box-shadow: none !important;
+}
+/* Newspaper Template surface norm: route-specific card names cannot restore
+   a filled panel. Structure comes from rules, spacing, and type; paper is the
+   document canvas. */
+:where(.evidence-grid article, .stat, .index-card, .machine, .boundary, .legal-status, .proposal-figure, .path, .hero-card) {
+  border-color: var(--estate-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--estate-ink) !important;
+  box-shadow: none !important;
+}
+.gallery-card { overflow: visible !important; }
+:where(table, pre, code, .fountain-page) { max-width: 100%; overflow-wrap: anywhere; }
+code, pre, kbd, samp { font-family: var(--estate-mono) !important; }
+table { border-color: var(--estate-line) !important; background: transparent !important; }
+th, td { border-color: var(--estate-line) !important; }
+pre { overflow-x: auto; border-color: var(--estate-line) !important; background: transparent !important; color: var(--estate-ink) !important; }
+:where(pre.text, pre.text code) {
+  max-width: 68ch !important;
+  white-space: pre-wrap !important;
+  overflow-x: visible !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+img, svg { max-width: 100%; }
+
+/* Newspaper Template: scientific-footnote footer / single-column-footnote.
+   Every estate route may
+   retain its semantic grouping, but the projection is one ruled, transparent
+   reference apparatus: identity, publications, policy, then provenance. */
+:where(.footer, .site-footer, footer[role="contentinfo"]) {
+  --estate-footer-rule: 1px solid var(--estate-line);
+  display: block !important;
+  margin-top: 4rem;
+  padding: 1.15rem clamp(1rem, 5vw, 5rem) 1.35rem !important;
+  border: 0 !important;
+  border-top: var(--estate-footer-rule) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--estate-muted) !important;
+  font-family: var(--estate-utility) !important;
+  font-size: .64rem !important;
+  line-height: 1.35 !important;
+  box-shadow: none !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]).footer,
+:where(.footer, .site-footer, footer[role="contentinfo"]).site-footer {
+  position: static !important;
+  width: 100% !important;
+  left: auto !important;
+  margin-left: 0 !important;
+  font-size: 10.24px !important;
+  line-height: 13.824px !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) :where(.footer-grid, .footer-estate, .footer-legal) {
+  display: block !important;
+  margin: 0 0 .3rem !important;
+  padding: 0 !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) .footer-footnotes {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 10.24px !important;
+  line-height: 13.824px !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) .footer-footnote {
+  display: grid !important;
+  grid-template-columns: 1.6rem minmax(0, 72ch) !important;
+  gap: .35rem !important;
+  margin: 0 0 .18rem !important;
+  padding: 0 !important;
+  font-size: 10.24px !important;
+  line-height: 13.824px !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) .footer-footnote > span {
+  display: block !important;
+  max-width: 72ch !important;
+  margin: 0 !important;
+  font-size: 10.24px !important;
+  line-height: 13.824px !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) .footer-footnote-number {
+  color: var(--estate-accent) !important;
+  font-family: var(--estate-mono) !important;
+  font-size: 9.28px !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .04em !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) .footer-footnote :where(strong, a) {
+  font-size: inherit !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) .footer-group {
+  display: block !important;
+  margin: 0 0 .3rem !important;
+  padding: 0 !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) :where(h2, h3, strong) {
+  display: inline !important;
+  margin: 0 .7rem 0 0 !important;
+  color: var(--estate-ink) !important;
+  font-family: var(--estate-mono) !important;
+  font-size: .6rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .12em !important;
+  line-height: 1.35 !important;
+  text-transform: uppercase !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) :where(p, span, small) {
+  display: block !important;
+  margin: .3rem 0 0 !important;
+  max-width: 72ch !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) :where(.footer-estate a, .footer-legal a, .footer-group a) {
+  display: inline !important;
+  margin: 0 .8rem 0 0 !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) a {
+  color: var(--estate-muted) !important;
+  text-decoration-thickness: .06em !important;
+  text-underline-offset: .16em !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) a:hover { color: var(--estate-ink) !important; }
+:where(.footer, .site-footer, footer[role="contentinfo"]) :where(.footer-note, small) {
+  border-top: 1px solid var(--estate-line) !important;
+  padding-top: .35rem !important;
+  font-family: var(--estate-mono) !important;
+  font-size: .56rem !important;
+  letter-spacing: .035em !important;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) .footer-mark {
+  order: 99 !important;
+  display: block !important;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  margin: .35rem 0 0 !important;
+  opacity: .72;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) .footer-mark img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+/* The footer is the lower clamp of the reading frame. It can be deliberately
+   called into view by Info, then gives the page back to the reader while its
+   final mark remains as the alpha-and-omega witness. */
+:where(.footer, .site-footer, footer[role="contentinfo"])[data-footer-state="framing"] {
+  position: sticky !important;
+  bottom: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--estate-paper) 84%, transparent) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -.35rem 1rem rgb(61 52 40 / .08) !important;
+  transition: background-color .25s ease, box-shadow .25s ease, transform .45s ease, opacity .45s ease;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"])[data-footer-state="receding"] {
+  transform: translateY(calc(100% - 1.65rem));
+  opacity: .82;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"])[data-footer-state="receding"] .footer-footnotes {
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"]) .footer-footnotes {
+  transition: opacity .4s ease;
+}
+:where(.footer, .site-footer, footer[role="contentinfo"])[data-footer-intent="info"] .footer-footnotes {
+  opacity: 1;
+}
+
+@media (max-width: 72rem) {
+  .estate-nav { flex-wrap: wrap !important; }
+}
+
+/* The reading reel is a landscape affordance. At iPad portrait width, the
+   breadcrumb and document canvas are the primary navigation surface. */
+@media (max-width: 62rem) {
+  :where(.site-rail, .chapter-rail, aside.sidebar, .reading-index) { display: none !important; }
+  :where(.workspace, .site-workspace, .site-layout) { display: block !important; }
+  .estate-nav {
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    gap: .65rem !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: .35rem 0 .45rem !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    touch-action: pan-x;
+  }
+  .estate-nav::-webkit-scrollbar { display: none; }
+  .estate-nav a {
+    flex: 0 0 3.5rem !important;
+    width: 3.5rem !important;
+    min-height: 3.5rem !important;
+    justify-content: center !important;
+    padding: .8rem !important;
+    border-radius: .85rem !important;
+  }
+  .estate-nav svg { width: 1.5rem !important; height: 1.5rem !important; }
+  :where(.canvas, .site-canvas, .page) {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    padding: 1.25rem clamp(1rem, 5vw, 3rem) 0 !important;
+  }
+}
+
+@media (max-width: 40rem) {
+  :where(.site-header, .topbar, header[role="banner"]) { position: relative !important; align-items: flex-start !important; padding: .75rem 1rem !important; }
+  :where(.brand, .wordmark) { min-width: 0; flex: 1 1 auto; }
+  :where(.brand, .wordmark) :where(img, .brand-logo, .wordmark-logo, .brand-mark, .mark) { width: 2.3rem !important; height: 2.3rem !important; flex-basis: 2.3rem; }
+  .estate-nav {
+    position: static !important;
+    inset: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: .5rem !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding-bottom: .25rem !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    box-shadow: none !important;
+  }
+  .estate-nav::-webkit-scrollbar { display: none; }
+  .estate-nav a {
+    flex: 0 0 3.25rem !important;
+    width: 3.25rem !important;
+    min-height: 3.25rem !important;
+    justify-content: center !important;
+    padding: .7rem !important;
+    border-radius: .75rem !important;
+    white-space: normal;
+    text-align: center;
+  }
+  .estate-nav svg { display: block !important; width: 1.45rem !important; height: 1.45rem !important; }
+  :where(.header-actions, .topbar-actions) { flex-wrap: wrap; }
+  main h1 { font-size: clamp(2.5rem, 13vw, 4rem) !important; }
+  table { display: block; overflow-x: auto; }
+  pre { white-space: pre-wrap !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* Newspaper Template mobile invariant: the estate button rail is primary
+   navigation, not a collapsible site menu. Keep it visible in Safari and
+   every WebKit-sized projection, including older domain-specific shells. */
+@media (max-width: 48rem) {
+  .estate-nav.site-nav[data-site-nav]:not([data-open="true"]) {
+    display: flex !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+}

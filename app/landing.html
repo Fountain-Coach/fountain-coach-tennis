@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Planung einer fairen regelmäßigen Tennis-Spielrunde.">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Tennisrunde · Zusammen spielen</title>
+  <link rel="stylesheet" href="src/styles.css">
+  <link rel="stylesheet" href="src/landing.css">
+  <link rel="stylesheet" href="src/pong-landing.css">
+  <link rel="stylesheet" href="src/footer.css">
+  <link rel="stylesheet" href="src/linotype-utility.css">
+  <script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","cannon-es":"/node_modules/cannon-es/dist/cannon-es.js","@csound/browser":"/node_modules/@csound/browser/dist/csound.js"}}</script>
+</head>
+<body>
+  <section class="public-landing" aria-labelledby="landing-title">
+    <header class="landing-header"><a class="landing-brand" href="/" aria-label="Startseite"><span class="tennisball-logo" role="img" aria-label="Tennisball"></span></a></header>
+    <main class="landing-minimal">
+      <div class="landing-ball" id="pong-stage" role="application" tabindex="0" aria-label="Isometrische Pong-Tennisbühne. Zum Drehen ziehen oder Pfeiltasten verwenden."><canvas id="pong-canvas" aria-hidden="true"></canvas><button id="pong-audio" class="pong-audio" type="button">Sound aktivieren</button></div>
+      <div class="landing-copy"><h1 id="landing-title">Zusammen<br><em>spielen.</em></h1><a class="landing-cta" href="/app/">Planen <span aria-hidden="true">↗</span></a></div>
+    </main>
+  </section>
+  <script type="module" src="src/pong-stage.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "name": "fountain-coach-tennis.private-pong-estate",
+  "mode": "direct-static-application",
+  "navigation": {
+    "labels": ["Planen"],
+    "identityAttribute": "data-estate-id",
+    "requiredCurrentCount": 1,
+    "requiredMobileStateWhenSiteNav": false,
+    "requiredStaticIcons": true,
+    "iconSystem": {
+      "variant": "outline-regular-medium",
+      "viewBox": "0 0 24 24"
+    }
+  },
+  "sharedAssets": {
+    "stylesheet": "/assets/estate-core.css",
+    "script": "/assets/estate-core.js"
+  }
+}

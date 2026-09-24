@@ -1,0 +1,32 @@
+id: tennis-contract-boundary
+version: 0.1.0
+instrument: fountaincoach.tennis-round@0.1.0
+owner: fountain-coach-tennis
+scope: one authenticated tenant and user
+topics:
+  query: fountainstore/tennis.schedule.query
+  mutation: fountainstore/tennis.schedule.mutate
+  result: fountainstore/tennis.schedule.result
+preconditions:
+  - authenticated user and tenant are bound before dispatch
+  - request carries a correlation id
+actions:
+  - operation: schedule.query
+    topic: fountainstore/tennis.schedule.query
+  - operation: schedule.generate
+    topic: fountainstore/tennis.schedule.mutate
+    confirmation: required
+    idempotencyKey: required
+terminalPredicates:
+  - result.terminal == true
+  - result.correlationID == request.correlationID
+  - result.tenantID == request.tenantID
+  - result.userID == request.userID
+negativeCases:
+  - mutation without confirmation is refused
+  - mutation without idempotency key is refused
+  - mutation sent to query topic is refused
+evidence:
+  - typed Swift contract tests
+  - IDL lint and regenerated facts
+claimBoundary: contract-declared; Store migration and live acceptance remain open

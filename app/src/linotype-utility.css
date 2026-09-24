@@ -1,0 +1,96 @@
+/* Utility surface: the same transparent Linotype rules as the Estate shell. */
+body.app-mode {
+  --ink: #27231f;
+  --paper: #f3efe7;
+  --line: #d5cec2;
+  --muted: #706a60;
+  --accent: #7b6643;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Charter, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+body.app-mode .topbar {
+  border-top: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 18px clamp(18px, 5vw, 72px);
+  align-items: center;
+  background: transparent;
+}
+/* The utility route uses the same quiet green tennis-ball mark as the stage. */
+body.app-mode .brand { display: flex; }
+body.app-mode .tennisball-logo {
+  width: 42px;
+  height: 42px;
+  background: #b7d334;
+  border-color: #0f765f;
+  box-shadow: 4px 4px 0 #b7d334;
+}
+body.app-mode .top-actions { gap: 18px; }
+body.app-mode .top-actions button {
+  border: 0;
+  border-bottom: 1px solid transparent;
+  padding: 8px 0;
+  min-height: 44px;
+  background: transparent;
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .7rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+body.app-mode .top-actions button:hover,
+body.app-mode .top-actions button:focus-visible {
+  border-bottom-color: var(--accent);
+  outline: 0;
+  color: var(--accent);
+}
+body.app-mode .top-actions .primary { color: var(--accent); background: transparent; border-color: transparent; }
+body.app-mode .top-actions .quiet { color: var(--muted); }
+body.app-mode .connection,
+body.app-mode .login-action { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; }
+body.app-mode .dashboard-shell[aria-hidden="true"] { display: none; }
+body.app-mode .connection { color: var(--muted); }
+body.app-mode .login-action { color: var(--accent); min-height: 44px; padding: 8px 0; text-decoration: underline; text-underline-offset: 4px; }
+body.app-mode .auth-gate { display: grid; min-height: 60vh; place-items: center; padding: 48px 18px; }
+body.app-mode .auth-gate-card { width: min(620px, 100%); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 44px 0; }
+body.app-mode .auth-gate-card h2 { font-size: clamp(2.2rem, 6vw, 5rem); font-weight: 400; letter-spacing: -.06em; line-height: .9; margin-bottom: 18px; }
+body.app-mode .auth-gate-card p:not(.kicker) { color: var(--muted); max-width: 42ch; }
+body.app-mode .auth-gate-button { display: inline-flex; align-items: center; gap: 24px; min-height: 48px; padding: 12px 18px; background: var(--ink); color: var(--paper); text-decoration: none; }
+body.app-mode main { max-width: 100%; padding: clamp(28px, 5vw, 72px) clamp(18px, 7vw, 96px) 72px; }
+body.app-mode .summary {
+  grid-template-columns: minmax(0, 1fr) auto;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 30px;
+  background: transparent;
+}
+body.app-mode .summary h2,
+body.app-mode .toolbar h2,
+body.app-mode .analysis-grid h3,
+body.app-mode .day-head h3 { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; }
+body.app-mode .summary h2 { font-size: clamp(2.6rem, 6vw, 6.8rem); font-weight: 400; letter-spacing: -.07em; line-height: .86; }
+body.app-mode .kicker { color: var(--accent); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .7rem; letter-spacing: .2em; }
+body.app-mode #status, body.app-mode .muted { color: var(--muted); font-size: 1.05rem; }
+body.app-mode .metrics { align-self: stretch; }
+body.app-mode .metric { border-left: 1px solid var(--line); padding: 12px 24px; }
+body.app-mode .metric:last-child { border-right: 1px solid var(--line); }
+body.app-mode .metric strong { font-size: 3rem; color: var(--ink); }
+body.app-mode .metric span { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .62rem; }
+body.app-mode .tabs { border-bottom: 1px solid var(--ink); margin-top: 36px; }
+body.app-mode .tab { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; }
+body.app-mode .tab.active { background: var(--ink); color: var(--paper); }
+body.app-mode .panel { padding-top: 34px; }
+body.app-mode .day-card,
+body.app-mode .player-card,
+body.app-mode .analysis-card { border: 1px solid var(--line); border-radius: 0; box-shadow: none; background: transparent; }
+body.app-mode .day-card:nth-child(odd), body.app-mode .day-card:nth-child(even) { border-top: 1px solid var(--line); }
+body.app-mode .match { background: color-mix(in srgb, var(--paper) 86%, var(--accent)); border-color: var(--line); }
+body.app-mode select, body.app-mode input { border-color: var(--line); background: transparent; }
+body.app-mode button:hover, body.app-mode button:focus-visible,
+body.app-mode select:focus-visible, body.app-mode input:focus-visible { outline-color: var(--accent); }
+@media (max-width: 800px) {
+  body.app-mode .topbar { align-items: flex-start; }
+  body.app-mode .top-actions { width: 100%; justify-content: space-between; gap: 12px; }
+  body.app-mode .summary { grid-template-columns: 1fr; }
+  body.app-mode .metrics { margin-top: 18px; }
+  body.app-mode .metric { flex: 1; padding-inline: 12px; }
+}

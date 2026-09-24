@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "host": "tennis.fountain.coach",
+  "publicationRole": "private Tennis-App Pong landing projection",
+  "publicationState": "candidate",
+  "source": "../../tennis-route-manifest.json",
+  "sourceRouteManifest": "../../tennis-route-manifest.json",
+  "sourceRouteMap": "../../tennis.fountain.coach/route-map.yaml",
+  "claimBoundary": "This public page contains no player or schedule data. Runtime, authentication, backup, restore, and deployment remain separately governed.",
+  "routes": ["/", "/app/"]
+}

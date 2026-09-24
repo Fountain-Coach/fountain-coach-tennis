@@ -1,0 +1,167 @@
+:root { color-scheme: light dark; --ink:#1f2328; --muted:#59636e; --paper:#ffffff; --surface:#f6f8fa; --line:#d0d7de; --accent:#8b302b; font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+[data-theme="light"] { color-scheme:light; --ink:#1f2328; --muted:#59636e; --paper:#ffffff; --surface:#f6f8fa; --line:#d0d7de; --accent:#8b302b; }
+[data-theme="dark"] { color-scheme:dark; --ink:#f1f3f5; --muted:#b3bbc4; --paper:#17191c; --surface:#20242a; --line:#414852; --accent:#e38a7c; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); }
+a { color:var(--accent); text-underline-offset:.18em; }
+a:hover { color:#67271f; }
+.skip-link { position:absolute; left:1rem; top:-5rem; padding:.7rem 1rem; background:var(--ink); color:#fff; z-index:10; }
+.skip-link:focus { top:1rem; }
+.site-header { border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; background:var(--paper); }
+.nav-shell,.layout { max-width:76rem; margin:auto; padding-left:clamp(1rem,4vw,3rem); padding-right:clamp(1rem,4vw,3rem); }
+.nav-shell { padding-top:.8rem; padding-bottom:.8rem; display:flex; align-items:center; justify-content:space-between; gap:1.5rem; }
+.brand { color:var(--ink); text-decoration:none; display:inline-flex; align-items:center; gap:.65rem; font-weight:700; letter-spacing:.02em; }
+.brand-logo { width:2rem; height:2rem; object-fit:cover; border-radius:50%; border:1px solid var(--line); background:var(--paper); }
+.brand small { display:block; color:var(--muted); font:500 .7rem/1.3 "Courier New",Courier,monospace; letter-spacing:.04em; }
+.site-nav { display:flex; gap:1.1rem; align-items:center; }
+.site-nav a { color:var(--muted); text-decoration:none; font-size:.9rem; min-height:2.75rem; display:inline-flex; align-items:center; }
+.site-nav a[aria-current="page"] { color:var(--ink); font-weight:700; }
+.menu-button { display:none; min-height:2.75rem; border:1px solid var(--ink); border-radius:0; padding:.45rem .75rem; background:var(--paper); color:var(--ink); font:inherit; }
+.theme-button { min-height:2.75rem; border:1px solid var(--line); border-radius:.4rem; padding:.45rem .7rem; background:var(--paper); color:var(--ink); font:600 .78rem/1 "Courier New",Courier,monospace; cursor:pointer; }
+.theme-button:hover { border-color:var(--ink); }
+.layout { padding-top:clamp(1.5rem,3vw,2.5rem); padding-bottom:3rem; }
+.breadcrumbs { color:var(--muted); font-size:.85rem; margin-bottom:2rem; }
+.breadcrumbs ol { display:flex; flex-wrap:wrap; gap:.6rem; padding:0; margin:0; list-style:none; }
+.breadcrumbs li + li::before { content:"/"; margin-right:.6rem; color:var(--muted); }
+.breadcrumb-root { display:inline-flex; align-items:center; gap:.5rem; color:var(--muted); text-decoration:none; }
+.breadcrumb-root:hover { color:var(--ink); }
+.breadcrumb-root img { width:1.7rem; height:1.7rem; object-fit:contain; }
+.breadcrumbs [aria-current="page"] { color:var(--ink); font-weight:600; }
+:where(#main, [id]) { scroll-margin-top:clamp(5rem,12vw,8rem); }
+.hero { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(18rem,.65fr); gap:clamp(2rem,7vw,6rem); padding:1rem 0 clamp(2.5rem,5vw,4rem); align-items:start; position:relative; }
+.hero-aside { display:grid; gap:1rem; }
+.brand-card { margin:0; padding:1rem; border:1px solid var(--line); border-radius:.75rem; background:var(--paper); }
+.brand-card img { display:block; width:min(100%,12rem); aspect-ratio:1; margin:0 auto .8rem; object-fit:contain; border-radius:.5rem; background:transparent; }
+.brand-card figcaption { border-top:1px solid var(--line); padding:.8rem .15rem .15rem; }
+.brand-card strong,.brand-card span { display:block; }
+.brand-card strong { font-family:Georgia,"Times New Roman",serif; font-size:1.25rem; font-weight:500; }
+.brand-card span { color:var(--muted); margin-top:.2rem; font-size:.86rem; }
+.eyebrow { color:var(--muted); font:650 .74rem/1.3 "Courier New",Courier,monospace; letter-spacing:.1em; text-transform:uppercase; }
+h1,h2,h3 { font-family:Georgia,"Times New Roman",serif; letter-spacing:-.045em; line-height:1.08; margin:0; }
+h1 { max-width:12ch; font-size:clamp(2.8rem,7vw,6rem); font-weight:500; text-wrap:balance; }
+h2 { font-size:clamp(1.7rem,3vw,2.7rem); font-weight:500; }
+h3 { font-size:1.05rem; }
+.issue-mark { color:var(--accent); margin:1.35rem 0 .65rem; font:700 .72rem/1.3 "Courier New",Courier,monospace; letter-spacing:.1em; }
+.lead { max-width:44rem; color:var(--muted); font-size:clamp(1.05rem,1.8vw,1.22rem); }
+.source-line { color:var(--muted); font-size:.9rem; }
+.status-panel { border:1px solid var(--line); border-radius:.5rem; padding:1.25rem; background:var(--surface); color:var(--muted); position:relative; }
+.status-panel::before { content:"PUBLICATION NOTE"; display:block; color:var(--accent); font:700 .68rem/1.3 "Courier New",Courier,monospace; letter-spacing:.1em; border-bottom:1px solid var(--line); padding-bottom:.65rem; }
+.status-panel strong,.status-panel span,.status-panel a { display:block; }
+.status-panel strong { color:var(--ink); margin:.55rem 0 .2rem; }
+.section { border-top:1px solid var(--line); padding:clamp(2.5rem,5vw,4rem) 0; }
+.section-heading { display:flex; justify-content:space-between; align-items:end; gap:2rem; margin-bottom:2rem; }
+.section-heading p { max-width:40rem; color:var(--muted); margin:0; }
+.lineage-grid,.estate-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+.estate-grid { grid-template-columns:repeat(4,1fr); }
+.lineage-card,.estate-card { border:1px solid var(--line); border-radius:.5rem; padding:1.25rem; background:var(--surface); }
+.lineage-card img { display:block; width:100%; aspect-ratio:4/3; object-fit:cover; border:1px solid var(--line); border-radius:.35rem; filter:grayscale(.12) saturate(.9); margin-bottom:1rem; }
+.lineage-card h3 { margin-bottom:.45rem; }
+.lineage-card p,.estate-card p { color:var(--muted); }
+.lineage-card figcaption { color:var(--muted); font-size:.85rem; margin-top:.7rem; }
+.estate-card { border-top:2px solid var(--ink); border-left:0; border-right:0; border-bottom:0; border-radius:0; padding:1rem 0; background:transparent; }
+.estate-card strong,.estate-card span { display:block; }
+.estate-card span { color:var(--muted); margin-top:.35rem; font-size:.9rem; }
+.statement { max-width:52rem; margin:0; padding:1.4rem 1.6rem; border:0; border-left:4px solid var(--accent); background:transparent; font-size:1.3rem; }
+.boundary { color:var(--muted); max-width:48rem; }
+.footer { border-top:1px solid var(--line); padding:2rem 0 1rem; color:var(--muted); font-size:.85rem; position:relative; }
+.footer-mark { display:block; width:3rem; height:3rem; margin-bottom:1.25rem; }
+.footer-mark img { display:block; width:100%; height:100%; object-fit:contain; }
+.footer p { margin:.45rem 0; }
+/* The historic marks are monochrome source illustrations. In dark mode their
+   light canvas and dark ink otherwise collapse into the surface. Invert the
+   complete asset so the ink remains legible without introducing a new colour
+   palette or altering the published light presentation. */
+[data-theme="dark"] .brand-logo,
+[data-theme="dark"] .brand-card img,
+[data-theme="dark"] .lineage-card img { filter:invert(1) grayscale(1); }
+@media (max-width:48rem) { .menu-button { display:inline-flex; align-items:center; } .site-nav { display:none; position:absolute; left:1rem; right:1rem; top:calc(100% + .5rem); padding:.5rem; flex-direction:column; align-items:stretch; gap:0; background:var(--paper); border:1px solid var(--line); border-radius:.4rem; box-shadow:0 .5rem 1.5rem rgba(0,0,0,.12); } .site-nav[data-open="true"] { display:flex; } .site-nav a { padding:.7rem; } .hero,.section-heading { display:block; } .status-panel { margin-top:2rem; } .lineage-grid,.estate-grid { grid-template-columns:1fr; } .section-heading p { margin-top:1rem; } }
+.proposal-hero { grid-template-columns:minmax(0,1.1fr) minmax(20rem,.9fr); }
+.proposal-hero h1 { max-width:10ch; }
+.proposal-hero .lead { max-width:48rem; }
+.proposal-figure { margin:0; padding:1rem; border:1px solid var(--line); background:var(--surface); }
+.proposal-figure img { display:block; width:100%; height:auto; aspect-ratio:16/10; object-fit:cover; }
+.proposal-figure figcaption { color:var(--muted); font-size:.82rem; margin-top:.75rem; }
+.proposal-body { max-width:58rem; }
+.proposal-body h2 { margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid var(--line); }
+.proposal-body h3 { margin-top:1.75rem; font-size:1.35rem; }
+.proposal-body p { max-width:54rem; }
+.proposal-body ul { padding-left:1.25rem; }
+.proposal-table { width:100%; border-collapse:collapse; margin:1.25rem 0 2rem; font-size:.92rem; }
+.proposal-table th,.proposal-table td { text-align:left; vertical-align:top; padding:.75rem; border-bottom:1px solid var(--line); }
+.proposal-table th { color:var(--muted); font:700 .72rem/1.3 "Courier New",Courier,monospace; letter-spacing:.08em; text-transform:uppercase; }
+.proposal-callout { border-left:4px solid var(--accent); padding:1rem 1.25rem; background:var(--surface); }
+@media (max-width:48rem) { .proposal-hero { display:block; } .proposal-figure { margin-top:2rem; } .proposal-table { display:block; overflow-x:auto; } }
+/* The route uses the deployed estate icon rail. Keep its visible labels in
+   the accessibility tree while rendering only the icon on the rail. */
+.estate-nav .estate-icon { position:relative; justify-content:center; width:2.25rem; padding-inline:.45rem !important; }
+.estate-nav .estate-icon span { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .proposal-callout,
+  :root:not([data-theme="light"]) .proposal-figure { background:#fbfaf6; color:#27231f; }
+  :root:not([data-theme="light"]) .proposal-callout strong { color:#27231f; }
+  :root:not([data-theme="light"]) .proposal-figure figcaption { color:#706a60; }
+}
+/* Keep the shared estate navigation closed until the mobile menu opens it. */
+@media (max-width:48rem) {
+  .site-nav[data-site-nav]:not([data-open="true"]) { display:none !important; }
+  .site-nav[data-site-nav][data-open="true"] { display:flex !important; }
+}
+
+/* Future-facing estate entry: one central, inspectable portal before the authority map. */
+.estate-portal-page { padding-bottom:5rem; }
+.portal-intro { min-height:clamp(34rem,62vw,46rem); padding:1rem 48% clamp(3rem,7vw,6rem) 0; background:url('future-estate-portal.svg') right top / min(46%,38rem) auto no-repeat; }
+.portal-copy { max-width:58rem; }
+.portal-copy h1 { max-width:18ch; }
+.portal-intention { max-width:48rem; margin:2rem 0 1rem; padding:1.1rem 1.3rem; border-left:2px solid var(--accent); font-size:1.15rem; }
+.portal-visual-section { border-top:1px solid var(--line); padding:clamp(3rem,7vw,6rem) 0; }
+.portal-figure { margin:0; padding:0; border:1px solid var(--line); background:transparent; }
+.portal-figure img { display:block; width:100%; height:auto; aspect-ratio:12/7; object-fit:contain; }
+.portal-figure figcaption { padding:1rem 1.2rem 1.2rem; border-top:1px solid var(--line); color:var(--muted); font-size:.9rem; }
+.portal-figure figcaption strong { color:var(--ink); }
+.portal-links { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; margin-top:2.5rem; }
+.portal-links a { display:grid; grid-template-columns:2.3rem 1fr; column-gap:.7rem; align-items:start; padding:1rem 0; border-top:2px solid var(--ink); color:var(--ink); text-decoration:none; }
+.portal-links a:hover { color:var(--accent); }
+.portal-links span { grid-row:span 2; color:var(--accent); font:700 .75rem/1.3 "Courier New",Courier,monospace; letter-spacing:.08em; }
+.portal-links strong { font-family:Georgia,"Times New Roman",serif; font-size:1.1rem; font-weight:500; }
+.portal-links small { grid-column:2; margin-top:.35rem; color:var(--muted); font-size:.85rem; line-height:1.45; }
+.authority-entry { padding-top:clamp(3rem,6vw,5rem); }
+.mark-reading { max-width:58rem; margin:0 0 2rem; padding:1.25rem 1.5rem; border-left:2px solid var(--accent); }
+.mark-reading p { max-width:52rem; margin:.15rem 0; }
+.mark-reading strong { font-family:Georgia,"Times New Roman",serif; font-size:1.15rem; font-weight:500; }
+.mark-reading-note { color:var(--muted); font-size:.9rem; }
+.estate-card-head { display:flex; align-items:center; gap:.65rem; min-height:1.8rem; margin-bottom:.65rem; color:var(--accent); }
+.estate-card-head svg { width:1.35rem; height:1.35rem; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.6; }
+.estate-card-head small { color:var(--muted); font:700 .62rem/1.3 "Courier New",Courier,monospace; letter-spacing:.08em; }
+.boundary-entry { padding-bottom:2rem; }
+@media (max-width:72rem) { .estate-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:48rem) { .portal-intro { min-height:0; padding:1rem 0 3rem; background:none; } .portal-links,.estate-grid { grid-template-columns:1fr; gap:1rem; } .portal-figure img { aspect-ratio:1/1; } .portal-intention { font-size:1rem; } }
+/* Authored estate essays keep continuous newspaper prose while preserving
+   the shared Publication Core frame and explicit claim boundary. */
+.essay-article { max-width: 78rem; margin-inline: auto; }
+.essay-header { max-width: 78rem; }
+.essay-header h1 { max-width: 14ch; }
+.essay-prose { max-width: 68ch; margin-inline: auto; }
+.essay-prose p { margin: 0; }
+.essay-prose p + p { margin-top: 1rem; }
+.essay-prose h2 { margin: 3.5rem 0 1rem; }
+.essay-prose h2 + p { margin-top: 0; }
+.essay-figure { margin: 3rem auto; max-width: 78rem; }
+.essay-figure img { display: block; width: 100%; height: auto; }
+.essay-figure figcaption { margin-top: .75rem; color: var(--estate-muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; }
+.essay-gallery { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:2rem; }
+.essay-gallery-card { min-width:0; border-top:2px solid var(--ink); }
+.essay-gallery-image { display:block; margin-top:1rem; border:1px solid var(--line); background:var(--surface); }
+.essay-gallery-image img { display:block; width:100%; aspect-ratio:12/7; object-fit:cover; }
+.essay-gallery-copy { padding:1rem 0 1.5rem; min-width:0; }
+.essay-gallery-copy h3 { margin:.4rem 0 .7rem; font:500 clamp(1.35rem,2.4vw,2.1rem)/1.08 Georgia,"Times New Roman",serif; overflow-wrap:anywhere; }
+.essay-gallery-copy h3 a { color:var(--ink); text-decoration:none; }
+.essay-gallery-copy h3 a:hover { color:var(--accent); }
+.essay-gallery-copy p { max-width:42rem; margin:0; color:var(--muted); }
+.essay-pagination { display:flex; flex-wrap:wrap; gap:1rem 2rem; align-items:baseline; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--line); color:var(--muted); font: .8rem/1.4 "Courier New",Courier,monospace; }
+.essay-pagination [aria-current="page"] { color:var(--ink); font-weight:700; }
+@media (max-width: 640px) { .essay-gallery { grid-template-columns:1fr; gap:1rem; } }
+.essay-boundary { max-width: 68ch; margin: 3rem auto; padding-block: 1rem; border-block: 1px solid var(--estate-rule); }
+.teatro-score-figure { max-width: 78rem; }
+.teatro-score-figure img { aspect-ratio: 1200 / 630; object-fit: contain; background: #f5f0e7; border: 1px solid var(--line); }
+.teatro-score-figure figcaption { max-width: 68ch; }
+@media (max-width: 640px) { .essay-header h1 { max-width: none; } .essay-figure { margin-block: 2rem; } }

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="publication-state" content="candidate">
+  <meta name="fountain:publication-role" content="private-tennis-pong-estate-identity">
+  <meta name="color-scheme" content="light dark">
+  <title>Planen · Tennisrunde</title>
+  <link rel="stylesheet" href="/assets/estate-core.css">
+  <script src="/assets/estate-core.js" defer></script>
+  <style>
+    :root { --paper:#f3f0e8; --ink:#171918; --red:#bd5140; --acid:#d9ef2d; --green:#075d4c; --muted:#686b65; }
+    * { box-sizing:border-box; } html,body { min-height:100%; margin:0; }
+    body { background:var(--paper); color:var(--ink); font-family:Arial,Helvetica,sans-serif; }
+    .tennis-page { min-height:100vh; padding:clamp(1.1rem,4vw,3rem) clamp(1.1rem,7vw,6rem) 2rem; overflow:hidden; }
+    .tennis-header,.tennis-main,.tennis-footer { max-width:64rem; margin:0 auto; }
+    .tennis-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-bottom:1.25rem; border-bottom:1px solid var(--ink); }
+    .ball-mark { width:3rem; height:3rem; flex:0 0 auto; border-radius:50%; background:var(--acid); position:relative; box-shadow:.35rem .35rem 0 rgba(23,25,24,.14); }
+    .ball-mark::before,.ball-mark::after,.pong-ball::before,.pong-ball::after { content:""; position:absolute; border:.16rem solid var(--green); border-left:0; border-top:0; border-radius:0 70% 70% 0; transform:rotate(25deg); }
+    .ball-mark::before,.ball-mark::after { width:1.55rem; height:2.85rem; left:.62rem; top:.06rem; }
+    .ball-mark::after { transform:rotate(205deg); left:.65rem; top:.18rem; }
+    .estate-nav { display:flex; align-items:center; }
+    .tennis-nav-link { min-height:44px; display:inline-flex; align-items:center; gap:.55rem; color:var(--ink); font-weight:800; letter-spacing:.15em; text-decoration:none; text-transform:uppercase; }
+    .tennis-nav-link svg { width:24px; height:24px; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; fill:none; }
+    .tennis-main { padding-top:clamp(2.2rem,6vw,5rem); }
+    .pong-stage { width:min(100%,48rem); height:clamp(17rem,42vw,31rem); margin:0 auto clamp(3.6rem,8vw,6.5rem); background:var(--red); transform:rotate(-3deg); position:relative; display:grid; place-items:center; overflow:hidden; }
+    .pong-stage::before,.pong-stage::after { content:""; position:absolute; border:2px solid rgba(243,240,232,.72); }
+    .pong-stage::before { inset:15% 10%; border-left:0; border-right:0; }
+    .pong-stage::after { width:1px; height:70%; background:rgba(243,240,232,.72); }
+    .pong-ball { width:clamp(7rem,17vw,12rem); height:clamp(7rem,17vw,12rem); border-radius:50%; background:var(--acid); position:relative; box-shadow:.85rem .85rem 0 rgba(95,38,31,.45); animation:pong-float 4s ease-in-out infinite alternate; }
+    .pong-ball::before,.pong-ball::after { width:4.8rem; height:9rem; left:2.6rem; top:-.1rem; border-width:.2rem; }
+    .pong-ball::after { transform:rotate(205deg); left:2.7rem; top:.25rem; }
+    @keyframes pong-float { from { transform:translate(-12%, 5%) rotate(-9deg); } to { transform:translate(12%, -5%) rotate(9deg); } }
+    @media (prefers-reduced-motion:reduce) { .pong-ball { animation:none; } }
+    .tennis-copy { max-width:48rem; margin:0 auto; }
+    .kicker { margin:0 0 1.15rem; font-size:clamp(.8rem,1.4vw,1rem); font-weight:800; letter-spacing:.2em; }
+    h1 { margin:0 0 2.3rem; font:400 clamp(3.8rem,10vw,8rem)/.82 Georgia,serif; letter-spacing:-.075em; }
+    h1 em { color:#a54539; font-style:normal; }
+    .plan-link { display:flex; align-items:center; justify-content:space-between; width:min(100%,32rem); min-height:5.2rem; padding:1.25rem 1.5rem; background:var(--ink); color:#fff; text-decoration:none; font-size:clamp(1rem,2vw,1.35rem); font-weight:800; }
+    .plan-link span { font-size:1.8rem; font-weight:400; }
+    .tennis-footer { margin-top:clamp(4rem,10vw,8rem); padding-top:1.25rem; border-top:1px solid var(--ink); color:var(--muted); font-size:.8rem; }
+    .tennis-footer .footer-footnotes { display:grid; gap:.35rem; }
+    .tennis-footer .footer-footnote { display:grid; grid-template-columns:1.6rem minmax(0,68ch); gap:.35rem; margin:0; }
+    .tennis-footer .footer-footnote-number { color:var(--red); font-family:SFMono-Regular,Consolas,monospace; }
+    .tennis-footer a { color:inherit; } .tennis-footer p { margin:0; }
+    .tennis-footer .footer-mark { display:block; width:2rem; height:2rem; margin-top:1rem; }
+    @media (max-width:34rem) { .tennis-page { padding-inline:1rem; } .tennis-header { align-items:flex-start; } .tennis-nav-link { font-size:.72rem; } .pong-stage { margin-bottom:3.6rem; } .plan-link { min-height:4.5rem; } }
+  </style>
+</head>
+<body>
+  <div class="tennis-page">
+    <a class="skip-link" href="#main">Zum Inhalt springen</a>
+    <header class="site-header tennis-header" role="banner" data-scroll-state="top" aria-label="Private Tennisrunde">
+      <div class="nav-shell">
+      <a class="brand" href="/" aria-label="Tennisrunde Startseite"><span class="brand-mark ball-mark" role="img" aria-label="Tennisball"></span></a>
+      <nav class="estate-nav site-nav tennis-nav" id="site-nav" data-site-nav data-open="false" role="navigation" aria-label="Tennisrunde Navigation">
+        <a class="tennis-nav-link" href="?app=1" data-estate-id="planen" aria-current="page">
+          <svg aria-hidden="true" data-icon-variant="outline-regular-medium" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span>Planen</span>
+        </a>
+      </nav>
+      </div>
+    </header>
+    <main id="main" class="tennis-main" data-estate-id="tennis-pong">
+      <div class="pong-stage" role="img" aria-label="Abstrakte Pong-Tennisplatz-Simulation"><span class="pong-ball" aria-hidden="true"></span></div>
+      <section class="tennis-copy" aria-labelledby="landing-title">
+        <p class="kicker">REGELMÄSSIGE TENNISRunde</p>
+        <h1 id="landing-title">Zusammen<br><em>spielen.</em></h1>
+        <a class="plan-link" href="?app=1">Planen <span aria-hidden="true">↗</span></a>
+      </section>
+    </main>
+    <footer id="footer" role="contentinfo" class="footer tennis-footer" data-footer-style="scientific-footnote">
+      <div class="footer-footnotes">
+        <p class="footer-footnote"><span class="footer-footnote-number">01</span><span><strong>Private Tennisrunde</strong> · Estate-Projektion · nur Planen und Pong.</span></p>
+        <p class="footer-footnote"><span class="footer-footnote-number">02</span><span><a href="https://fountain.coach/">Estate</a> · <a href="/">Landing</a> · <a href="?app=1">Planen</a></span></p>
+        <p class="footer-footnote"><span class="footer-footnote-number">03</span><span><a href="/imprint.html">Imprint</a> · <a href="/privacy.html">Privacy</a> · <a href="/accessibility.html">Accessibility</a></span></p>
+        <p class="footer-footnote"><span class="footer-footnote-number">04</span><span>Keine Spielerdaten auf dieser Landingpage · Planungsdaten bleiben im geschützten Bereich.</span></p>
+      </div>
+      <a class="footer-mark" href="/" aria-label="Tennisrunde Startseite"><span class="ball-mark" role="img" aria-label="Tennisball"></span></a>
+    </footer>
+  </div>
+</body>
+</html>

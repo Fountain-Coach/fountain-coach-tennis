@@ -1,0 +1,40 @@
+# Dependencies and package-manager caches
+node_modules/
+.npm/
+
+# Environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# Runtime state and private data
+.runtime/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.jsonl
+*.log
+*.bak
+
+# Generated/exported artifacts
+artifacts/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+*.zip
+
+# OS/editor metadata
+.DS_Store
+._*
+.idea/
+.vscode/
+*.swp
+
+# Local previews
+*.local.*
