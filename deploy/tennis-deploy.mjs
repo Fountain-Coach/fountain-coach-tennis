@@ -129,7 +129,7 @@ function deploy() {
       'mkdir -p "$release"',
       `tar -xzf '${remoteArchive}' -C "$release"`,
       'docker compose -p tennis-staging -f "$release/deploy/compose.staging.yml" up -d --build',
-      'curl --fail --silent --show-error --retry 20 --retry-delay 1 http://127.0.0.1:18080/healthz >/dev/null',
+      'curl --fail --silent --show-error --retry 20 --retry-all-errors --retry-delay 1 http://127.0.0.1:18080/healthz >/dev/null',
       `printf '{"schema":"fountain-coach.tennis.deploy-receipt.v1","state":"succeeded","environment":"${environment}","revision":"${revision}","url":"http://${p.host}:18080/","health":"http://127.0.0.1:18080/healthz"}\n'`,
       `rm -f '${remoteArchive}'`
     ].join('; ');
