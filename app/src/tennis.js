@@ -22,7 +22,7 @@ function applyRole(role) {
   const player = role === 'player';
   document.querySelectorAll('#generate, #import-local, #reset, #export-json, #import-json, [data-tab="players"], #players').forEach(element => { element.hidden = player; });
   document.body.classList.toggle('player-mode', player);
-  $('#connection').textContent = player ? 'ANGEMELDET · persönlicher Spielplan' : 'ANGEMELDET · gemeinsamer Spielplan';
+  $('#connection').textContent = player ? 'ANGEMELDET · SPIELER · persönlicher Spielplan' : 'ANGEMELDET · ORGANISATOR · gemeinsamer Spielplan';
 }
 
 function ensurePortableMigrationControls() {
