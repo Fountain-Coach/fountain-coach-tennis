@@ -43,6 +43,7 @@ This is development-only. Configure a real HTTPS deployment, server-side state, 
 
 - [PRIVACY.md](PRIVACY.md) records what was removed from this public seed and what remains to be implemented.
 - [SECURITY.md](app/SECURITY.md) describes the current security boundary and unresolved production requirements.
+- [docs/deployment.md](docs/deployment.md) explains local `.env` development and protected GitHub production secrets.
 - [docs/footer-claim.md](docs/footer-claim.md) preserves the estate footer claim verbatim and explains its scope.
 - OAuth client values, session secrets, bearer tokens, player data, and deployment credentials belong in the operator's secret/configuration systems, never in Git.
 
