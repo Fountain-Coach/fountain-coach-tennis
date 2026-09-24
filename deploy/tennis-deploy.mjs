@@ -197,7 +197,7 @@ function deployProduction(p, revision) {
     const releaseRoot = '/opt/tennis';
     const remote = [
       'set -Eeuo pipefail',
-      'rollback() { code=$?; if [ "$code" -ne 0 ] && [ -n "${previous:-}" ] && [ -d "$previous" ]; then ln -sfn "$previous" /opt/tennis/active; docker compose -p tennis-production -f "$previous/deploy/compose.production.yml" up -d --build || true; fi; exit "$code"; }',
+      'rollback() { code=$?; if [ "$code" -ne 0 ] && [ -n "${previous:-}" ] && [ -d "$previous" ]; then rm -f /opt/tennis/active; ln -s "$previous" /opt/tennis/active; docker compose --project-directory "$previous" -p tennis-production -f "$previous/deploy/compose.production.yml" up -d --build || true; fi; exit "$code"; }',
       'trap rollback ERR',
       'if ! command -v docker >/dev/null 2>&1; then apt-get update -qq; DEBIAN_FRONTEND=noninteractive apt-get install -y -qq docker.io docker-compose-v2 curl ca-certificates; systemctl enable --now docker; fi',
       'docker compose version >/dev/null',
@@ -208,9 +208,9 @@ function deployProduction(p, revision) {
       `tar -xzf ${shellQuote(remoteArchive)} -C "$release"`,
       `install -m 600 ${shellQuote(remoteEnv)} /etc/tennis/tennis.env`,
       `if docker volume inspect tennis-production-data >/dev/null 2>&1; then docker run --rm -v tennis-production-data:/var/lib/tennis -v ${shellQuote(`${releaseRoot}/backups`)}:/backups alpine:3.20 sh -c 'if [ -f /var/lib/tennis/tennis.sqlite ]; then cp /var/lib/tennis/tennis.sqlite /backups/tennis.sqlite.before-${revision}; fi'; fi`,
-      `ln -sfn "$release" ${shellQuote(`${releaseRoot}/active`)}`,
-      `docker compose -p tennis-production -f "$release/deploy/compose.production.yml" up -d --build`,
-      `docker compose -p tennis-production -f "$release/deploy/compose.production.yml" exec -T tennis-app node -e 'fetch("http://127.0.0.1:8787/healthz").then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))'`,
+      `rm -f ${shellQuote(`${releaseRoot}/active`)} && ln -s "$release" ${shellQuote(`${releaseRoot}/active`)}`,
+      `docker compose --project-directory "$release" -p tennis-production -f "$release/deploy/compose.production.yml" up -d --build`,
+      `docker compose --project-directory "$release" -p tennis-production -f "$release/deploy/compose.production.yml" exec -T tennis-app node -e 'fetch("http://127.0.0.1:8787/healthz").then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))'`,
       ...(skipPublicCheck ? [] : [`curl --fail --silent --show-error --retry 30 --retry-all-errors --retry-delay 2 --location https://${p.hostname}/healthz >/dev/null`]),
       'trap - ERR',
       `printf '{"schema":"fountain-coach.tennis.deploy-receipt.v2","state":"${skipPublicCheck ? 'prepared' : 'succeeded'}","environment":"production","revision":"${revision}","host":"${p.host}","hostname":"${p.hostname}","url":"https://${p.hostname}/","health":"https://${p.hostname}/healthz","publicReadback":"${skipPublicCheck ? 'skipped' : 'verified'}","release":"%s","rollback":"%s"}\n' "$release" "\${previous:-none}"`,
