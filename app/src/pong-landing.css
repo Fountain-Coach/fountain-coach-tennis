@@ -17,8 +17,9 @@
 @keyframes pong-orbit { to { transform:rotate(360deg); } }
 @keyframes pong-sway { to { opacity:.55; transform:rotate(82deg) scaleX(.85); } }
 @keyframes pong-bounce { to { transform:translate(110px,-70px); } }
+.pong-fallback { display:block; }
+.webgl-ready .pong-fallback { display:none; }
 .webgl-unavailable #pong-canvas { display:none; }
-.webgl-unavailable .pong-fallback { display:block; }
 .pong-audio { position:absolute; right:1rem; bottom:1rem; z-index:2; border:1px solid var(--pong-ink); background:var(--pong-paper); color:var(--pong-ink); padding:.65rem .85rem; font:inherit; font-size:.72rem; font-weight:800; cursor:pointer; }
 .pong-audio:focus-visible { outline:3px solid var(--pong-focus); outline-offset:3px; }
 .landing-copy { max-width:48rem; margin:0 auto; }
