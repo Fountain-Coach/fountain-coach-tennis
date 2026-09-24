@@ -16,6 +16,18 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; background: radial-gradient(circle at 92% 0, #d8e2cf 0, transparent 28rem), var(--paper); }
+.tennisball-logo { display: block; width: 42px; height: 42px; border-radius: 50%; background: var(--acid); border: 2px solid var(--green-dark); position: relative; box-shadow: 4px 4px 0 var(--court); }
+.tennisball-logo::before, .tennisball-logo::after { content: ""; position: absolute; width: 22px; height: 38px; border: 2px solid var(--green); border-left: 0; border-top: 0; border-radius: 0 70% 70% 0; transform: rotate(25deg); left: 9px; top: 0; }
+.tennisball-logo::after { transform: rotate(205deg); left: 10px; top: 2px; }
+.entry-page { min-height: 100vh; display: grid; place-items: center; background: var(--paper); }
+.entry-shell { width: min(520px, calc(100% - 36px)); text-align: center; padding: 48px 0; }
+.entry-shell .tennisball-logo { width: 64px; height: 64px; margin: 0 auto 34px; box-shadow: 6px 6px 0 var(--court); }
+.entry-shell .tennisball-logo::before, .entry-shell .tennisball-logo::after { width: 32px; height: 56px; left: 14px; }
+.entry-shell .tennisball-logo::after { left: 15px; top: 3px; }
+.entry-shell h1 { margin: 0 0 12px; }
+.entry-copy { color: var(--muted); margin: 0 0 28px; }
+.entry-login { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 28px; background: var(--ink); color: var(--paper); text-decoration: none; font-weight: 700; }
+.entry-login:hover, .entry-login:focus-visible { background: var(--green); outline: 3px solid var(--acid); outline-offset: 3px; }
 button, select, input { font: inherit; }
 button { min-height: 44px; border: 1px solid var(--ink); border-radius: 0; background: transparent; color: var(--ink); padding: 10px 14px; cursor: pointer; font-weight: 700; }
 button:hover, button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid var(--acid); outline-offset: 2px; }

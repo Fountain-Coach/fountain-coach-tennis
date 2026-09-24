@@ -7,8 +7,8 @@ This inventory records observed current behavior before schema or API expansion.
 
 | Route/state | Surface | Observed behavior |
 | --- | --- | --- |
-| / | Landing/Pong | Isometric Pong stage, sound control, landing presentation, link into planning mode |
-| /?app=1, /app, /app/ | Authenticated application shell | Auth gate, session check, shared-state load, schedule/players/analysis UI |
+| / | OAuth entry | Minimal title, tennis-ball logo, and one login action |
+| /app, /app/ | Authenticated application shell | Auth gate, session check, shared-state load, schedule/players/analysis UI |
 | app / Spielplan | Schedule | Date/player filters, generated match cards, match editing, validation, absence and rest display |
 | app / Spieler | Player/configuration management | Add player, name and active state, fixed first/last slot, absences, availability rules, season rules |
 | app / Auswertung | Analysis | Games, rest days, pair counts, fairness delta, absences, validation |

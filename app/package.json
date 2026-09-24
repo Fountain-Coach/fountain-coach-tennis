@@ -14,7 +14,7 @@
     "test:sqlite": "node tests/sqlite-authority.test.mjs",
     "test:oauth": "node tests/oauth-persistence.test.mjs",
     "test:recovery": "node tests/sqlite-backup.test.mjs",
-    "check": "node --check src/tennis.js && node --check src/pong-stage.js && node --check tests/tennis.test.mjs && node --check tests/authority-boundary.test.mjs && node --check tests/inventory.test.mjs && node --check tests/sqlite-authority.test.mjs && node --check tests/oauth-persistence.test.mjs && node --check tests/sqlite-backup.test.mjs && node --check tests/mcp-contract.test.mjs && node --check tests/remote-browser-contract.test.mjs && node --check preview.mjs && node --check mcp-server.mjs && node --check integration/tennis-service.mjs && node --check integration/tennis-authority.mjs && node --check integration/sqlite-authority.mjs && node --check integration/oauth-store.mjs && node --check integration/sqlite-backup.mjs && node --check integration/oauth.mjs",
+    "check": "node --check src/tennis.js && node --check tests/tennis.test.mjs && node --check tests/authority-boundary.test.mjs && node --check tests/inventory.test.mjs && node --check tests/sqlite-authority.test.mjs && node --check tests/oauth-persistence.test.mjs && node --check tests/sqlite-backup.test.mjs && node --check tests/mcp-contract.test.mjs && node --check tests/remote-browser-contract.test.mjs && node --check preview.mjs && node --check mcp-server.mjs && node --check integration/tennis-service.mjs && node --check integration/tennis-authority.mjs && node --check integration/sqlite-authority.mjs && node --check integration/oauth-store.mjs && node --check integration/sqlite-backup.mjs && node --check integration/oauth.mjs",
     "server": "node mcp-server.mjs"
   },
   "devDependencies": {
@@ -22,14 +22,11 @@
     "@playwright/test": "^1.63.0"
   },
   "dependencies": {
-    "@csound/browser": "7.0.0-beta33",
     "@modelcontextprotocol/sdk": "^1.30.0",
-    "cannon-es": "^0.20.0",
     "express": "^5.2.1",
     "express-rate-limit": "^8.3.1",
     "fflate": "^0.8.3",
     "jose": "^6.2.12",
-    "three": "^0.152.2",
     "zod": "^4.6.5"
   }
 }

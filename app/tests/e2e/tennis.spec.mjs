@@ -5,7 +5,7 @@ import {strFromU8, unzipSync} from 'fflate';
 import {DEFAULT_PLAYERS, generateSchedule} from '../../src/tennis-core.js';
 
 async function createPlan(page) {
-  await page.goto('/?app=1');
+  await page.goto('/app/');
   await page.evaluate(() => localStorage.clear());
   await page.reload();
   await page.getByRole('button', {name:'Spielplan erzeugen'}).click();
@@ -93,31 +93,18 @@ test.skip('Accessibility: keine automatisierten axe-Verstöße auf den Kernansic
   }
 });
 
-test('Produktansicht: Entwicklungssteuerung ist nicht sichtbar', async ({page}) => {
-  await page.goto('/?app=1');
+test('Produktansicht: Entwicklungssteuerung ist not visible before login', async ({page}) => {
+  await page.goto('/app/');
   await expect(page.locator('#auth-gate')).toBeVisible();
   await expect(page.locator('.dashboard-shell')).toBeHidden();
   await expect(page.getByRole('heading', {name: 'Bitte anmelden'})).toBeVisible();
   await expect(page.locator('#auth-gate-login')).toHaveAttribute('href', '/auth/login');
 });
 
-test('Landing: isometrische Pong-Stage lädt Three/Cannon und bietet Csound-Geste', async ({page}) => {
-  const consoleErrors = [];
-  page.on('console', message => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+test('Landing: minimaler OAuth-Einstieg', async ({page}) => {
   await page.goto('/');
-  await expect(page.locator('#pong-stage')).toBeVisible();
-  await expect(page.locator('#pong-stage')).toHaveAttribute('aria-label', /Isometrische Pong-Tennisbühne/);
-  await expect(page.locator('#pong-stage')).toHaveAttribute('tabindex', '0');
-  await expect(page.locator('#pong-canvas')).toHaveAttribute('aria-hidden', 'true');
-  await expect(page.locator('#pong-audio')).toHaveText('Sound aktivieren');
-  await expect.poll(async () => page.locator('#pong-canvas').evaluate(canvas => ({width: canvas.width, height: canvas.height}))).toMatchObject({width: expect.any(Number), height: expect.any(Number)});
-  const stage = page.locator('#pong-stage');
-  const box = await stage.boundingBox();
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.mouse.down();
-  await expect(stage).toHaveClass(/is-dragging/);
-  await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2 + 10);
-  await page.mouse.up();
-  await expect(stage).not.toHaveClass(/is-dragging/);
-  await expect.poll(() => consoleErrors.filter(error => !error.includes('favicon')).length).toBe(0);
+  await expect(page.getByRole('heading', {name:'Tennisrunde'})).toBeVisible();
+  await expect(page.getByRole('img', {name:'Tennisball'})).toBeVisible();
+  await expect(page.getByRole('link', {name:'Anmelden'})).toHaveAttribute('href', '/auth/login');
+  await expect(page.locator('script')).toHaveCount(0);
 });

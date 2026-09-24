@@ -233,7 +233,7 @@ app.get('/local-oauth/authorize', (request, response) => {
   if (!localAuthEnabled) return response.status(404).send('not found');
   const transaction = localOAuthRequests.get(request.query.state);
   if (!transaction || transaction.createdAt + 600_000 < Date.now()) return response.status(400).send('Lokale OAuth-Anfrage abgelaufen.');
-  response.type('html').send(`<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lokaler OAuth-Zugang · Tennisrunde</title><link rel="stylesheet" href="/app/src/styles.css"><link rel="stylesheet" href="/app/src/landing.css"><link rel="stylesheet" href="/app/src/linotype-utility.css"></head><body class="app-mode"><header class="topbar"><div class="brand"><span class="tennisball-logo" role="img" aria-label="Tennisball"></span></div><div class="top-actions"><span class="connection">LOKALER OAUTH-ANBIETER</span></div></header><main><section class="auth-gate" aria-labelledby="local-oauth-title"><div class="auth-gate-card"><p class="kicker">OAUTH-AUTORISIERUNG</p><h1 id="local-oauth-title">Tennisrunde</h1><p>Die lokale Testidentität <strong>${escapeHTML(localAuthEmail)}</strong> möchte auf den Tennis-Spielplan zugreifen.</p><form method="post" action="/local-oauth/authorize"><input type="hidden" name="state" value="${escapeHTML(transaction.state)}"><button class="auth-gate-button" type="submit">Zugriff erlauben <span aria-hidden="true">↗</span></button></form></div></section></main></body></html>`);
+  response.type('html').send(`<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lokaler OAuth-Zugang · Tennisrunde</title><link rel="stylesheet" href="/app/src/styles.css"><link rel="stylesheet" href="/app/src/linotype-utility.css"></head><body class="app-mode"><header class="topbar"><div class="brand"><span class="tennisball-logo" role="img" aria-label="Tennisball"></span></div><div class="top-actions"><span class="connection">LOKALER OAUTH-ANBIETER</span></div></header><main><section class="auth-gate" aria-labelledby="local-oauth-title"><div class="auth-gate-card"><p class="kicker">OAUTH-AUTORISIERUNG</p><h1 id="local-oauth-title">Tennisrunde</h1><p>Die lokale Testidentität <strong>${escapeHTML(localAuthEmail)}</strong> möchte auf den Tennis-Spielplan zugreifen.</p><form method="post" action="/local-oauth/authorize"><input type="hidden" name="state" value="${escapeHTML(transaction.state)}"><button class="auth-gate-button" type="submit">Zugriff erlauben <span aria-hidden="true">↗</span></button></form></div></section></main></body></html>`);
 });
 app.post('/local-oauth/authorize', (request, response) => {
   if (!localAuthEnabled) return response.status(404).send('not found');
@@ -260,7 +260,7 @@ const oauthCallback = async (request, response) => {
     if (result.context) {
       return response.type('html').send(consentHTML(beginOAuthConsent(result.identity, result.context, process.env)));
     }
-    response.redirect(302, '/?app=1&oauth=connected');
+    response.redirect(302, '/app/');
   } catch (error) {
     response.status(401).json({ ok: false, error: 'OAuth callback rejected.' });
   }
@@ -292,6 +292,7 @@ app.get(['/app', '/app/'], (request, response, next) => {
   if (!session || !isAdminIdentity(session, process.env)) return response.redirect(303, '/auth/login');
   next();
 });
+app.get(['/app', '/app/'], (request, response) => response.sendFile(resolve(staticRoot, 'app.html')));
 app.get('/healthz', (request, response) => response.json({ ok: true, service: 'fountain-coach-tennis' }));
 app.get('/api/state', apiLimiter, async (request, response) => {
   if (!authorized(request)) return response.status(401).set('WWW-Authenticate', `Bearer resource_metadata="${publicBaseUrl(request)}/.well-known/oauth-protected-resource/mcp"`).json({ error: 'Bearer authentication required.' });
