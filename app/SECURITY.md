@@ -22,6 +22,9 @@ the required legal review for the target jurisdiction.
 - Configure ChatGPT/OpenAI approval as `always` for all write tools and keep the server-side `confirm: true` gate.
 - Minimize logs: record operational metadata only, never player payloads or bearer tokens; define retention and deletion.
 - The built-in audit log records timestamp, operation and success only; rotate and delete it under a documented retention policy.
+- The local recovery primitive uses SQLite `VACUUM INTO`, integrity checks, mode `0600`, bounded retention, staged
+  restore, and a rollback snapshot. Production must add encrypted off-host custody, access separation, restore drills,
+  and an operational receipt before customer data is admitted.
 
 ## Abuse controls implemented
 

@@ -29,6 +29,8 @@ No unestablished item is claimed as complete by this audit.
   state and is importable only through an explicit confirmed `import_state` action.
 - SQLite mode now persists OAuth sessions and grants through hashed-key private records; JSON transition mode remains
   process-local and no production continuity claim is made for it.
+- Local SQLite recovery primitives now provide integrity-checked backup, restrictive permissions, retention, staged
+  restore, and rollback snapshots. Encrypted off-host custody and HCloud operational evidence remain unestablished.
 
 ## Estate-derived controls now adopted
 

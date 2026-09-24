@@ -110,7 +110,23 @@ unadmitted member role or admin UI was invented. JSON transition mode remains pr
 Proof: restart persistence test, token-material non-storage assertion, existing OAuth/provider tests, MCP/API
 contracts, syntax checks, privacy scan, diff check, semantic commit, and push to `main`.
 
-## Next bounded change — operational data recovery boundary
+## Current bounded change — operational data recovery boundary
 
 Capability: define and test protected SQLite backup/restore, retention, and rollback semantics before HCloud service
 release or production customer data use.
+
+Implementation result: add native SQLite `VACUUM INTO` backups with absolute-path validation, integrity checks,
+restrictive file permissions, timestamped retention, atomic staged restore, and an explicit rollback snapshot of the
+previous database. This is a local recovery primitive only; it does not claim encrypted off-host backups or live host
+operations.
+
+Proof: integrity-checked backup/restore test, restrictive permission assertion, rollback read-back, retention test,
+full application contracts, syntax checks, privacy scan, diff check, semantic commit, and push to `main`.
+
+## Next bounded change — WebKit acceptance and service-release admission
+
+Capability: establish the native Swift/WebKit semantic acceptance lane and separately resolve the missing typed HCloud
+service-release adapter before any live deployment claim.
+
+The backup primitive must be bound to that future service operation with encrypted/off-host custody, retention policy,
+capacity/readiness evidence, and recovery receipts; local tests do not establish those operational witnesses.
