@@ -1,0 +1,793 @@
+Implementation Prompt — Convert Tennis
+App to Full Multi-User Web Application
+Implementation Prompt
+Objective
+Convert the existing feature-complete, self-contained tennis application into a production-ready
+multi-user web application.
+The current application is the behavioral and visual specification.
+Preserve:
+• the current UI template;
+• the existing frontend structure;
+• the existing user-facing workflows;
+• the current domain terminology;
+• all existing calculations and rules;
+• all current entities and relationships;
+• all current user-visible functionality.
+The migration must add a proper shared backend, authentication, authorization, administration, and
+relational persistence without unnecessarily redesigning the current frontend.
+The target architecture is:
+Browser
+↓
+Existing Tennis Frontend Template
+↓
+Authenticated Application API
+↓
+Application Service
+↓
+Server-side SQLite
+GitHub OAuth provides identity.
+The tennis application itself owns authorization, roles, administration, and application data.
+────────────────────────────────────────
+1. Core Requirement
+The finished system must be a conventional multi-user web application with:
+Frontend
+user-facing tennis application
+matching the current template
+Backend
+authenticated application API
+complete CRUD
+administration
+business rules
+Tennis Multi-User Web Application — Implementation Prompt 1
+authorization
+Database
+authoritative server-side SQLite
+The browser must no longer be the authoritative owner of application data.
+Existing browser-local persistence must be migrated to the backend.
+────────────────────────────────────────
+2. Existing Application Is the Specification
+Before modifying the architecture, inspect the complete existing application.
+Inventory:
+• every entity;
+• every data field;
+• every relationship;
+• every screen;
+• every table;
+• every form;
+• every action;
+• every filter;
+• every sorting behavior;
+• every calculated value;
+• every validation rule;
+• every import/export capability;
+• every use of `localStorage`;
+• every use of `sessionStorage`;
+• every use of IndexedDB;
+• every derived or ephemeral state value.
+Produce an implementation map:
+existing feature
+→ current persistence
+→ target database representation
+→ target API
+→ frontend integration
+Do not silently omit features.
+Do not rebuild a smaller interpretation of the current application.
+The target must be current feature parity plus multi-user/backend capabilities.
+────────────────────────────────────────
+3. Full CRUD Is Required
+All persistent domain entities must support full CRUD unless there is an explicit domain reason to
+restrict deletion.
+CRUD means:
+Tennis Multi-User Web Application — Implementation Prompt 2
+Create
+Read
+Update
+Delete
+This applies to every persistent entity identified in the current application.
+Likely entities may include:
+users
+roles
+players
+teams
+clubs
+seasons
+competitions
+match_days
+matches
+sets
+results
+lineups
+availability
+locations
+settings
+configuration
+This list is illustrative.
+Derive the actual list from the repository.
+For every entity, implement:
+list
+get
+create
+update
+delete
+Where hard deletion would damage historical integrity, implement explicit archival or soft deletion
+instead, but expose it through the administration interface as the application's delete operation.
+Document such cases.
+────────────────────────────────────────
+4. Relational Data Model
+Replace browser-local state with a normalized SQLite schema.
+The database must represent:
+• entities;
+• relationships;
+• ownership where applicable;
+Tennis Multi-User Web Application — Implementation Prompt 3
+• ordering where relevant;
+• historical references;
+• role assignments;
+• audit metadata.
+Use stable identifiers.
+Prefer UUIDs or another durable non-sequential application identifier where appropriate.
+All relevant records should support:
+id
+created_at
+updated_at
+created_by
+updated_by
+Where useful also support:
+version
+deleted_at
+Enable SQLite foreign keys.
+Use explicit constraints.
+Use unique indexes where domain uniqueness exists.
+Use transactions for multi-record operations.
+Use WAL mode where appropriate.
+────────────────────────────────────────
+5. Application API
+Create a proper server-side API.
+The frontend must communicate with the backend exclusively through this API for authoritative
+application data.
+Do not give browser code direct database access.
+Provide CRUD endpoints for all entities.
+A conventional pattern is acceptable:
+GET /api/players
+GET /api/players/:id
+POST /api/players
+PATCH /api/players/:id
+DELETE /api/players/:id
+Repeat the corresponding model for every relevant entity.
+Domain-specific operations should have explicit endpoints where CRUD alone does not adequately
+represent the business operation.
+Examples:
+POST /api/matches/:id/result
+POST /api/match-days/:id/lineup
+POST /api/seasons/:id/activate
+Tennis Multi-User Web Application — Implementation Prompt 4
+Every write must:
+1. authenticate;
+2. authorize;
+3. validate input;
+4. enforce domain invariants;
+5. execute transactionally;
+6. return a structured result;
+7. return appropriate HTTP errors.
+────────────────────────────────────────
+6. Backend Administration
+Create a proper administration surface.
+This is distinct from the normal user-facing frontend.
+The backend administration interface must allow an authorized administrator to inspect and manage
+the entire application state.
+The administrator must have full CRUD capability over all manageable application entities.
+The administration surface must include at minimum:
+Dashboard
+Users
+Roles
+Players
+Teams
+Clubs
+Seasons
+Competitions
+Match Days
+Matches
+Results
+Lineups
+Availability
+Settings
+Application Configuration
+Import
+Export
+Database / backup status where appropriate
+Adapt this list to the actual entity model.
+────────────────────────────────────────
+7. Admin CRUD Interface
+Every domain entity must have an administration screen supporting, as applicable:
+list
+search
+filter
+Tennis Multi-User Web Application — Implementation Prompt 5
+sort
+inspect
+create
+edit
+delete/archive
+For entity relationships, the admin UI must expose meaningful selectors rather than requiring raw IDs.
+For example:
+Match
+season
+match day
+home player/team
+away player/team
+score
+status
+Use clear validation messages.
+Deletion of referenced data must never silently break relational integrity.
+The UI should either:
+• reject unsafe deletion with an explanation;
+• perform an intentional cascade where explicitly designed;
+• archive the entity.
+────────────────────────────────────────
+8. Backend Admin Authority
+Application administrators must be able to manage:
+• all tennis-domain entities;
+• user accounts;
+• application roles;
+• permissions where implemented;
+• application settings;
+• data imports;
+• data exports;
+• historical corrections;
+• erroneous records;
+• application configuration exposed as mutable state.
+An application administrator must not automatically gain:
+• server root access;
+• GitHub repository access;
+• deployment credentials;
+• shell access.
+These remain separate authority domains.
+────────────────────────────────────────
+9. Frontend User Application
+Tennis Multi-User Web Application — Implementation Prompt 6
+The existing frontend template must remain the primary user-facing application.
+Do not replace it with the administration interface.
+The frontend should continue to present the tennis application approximately as it currently does.
+Preserve:
+• visual hierarchy;
+• existing layout;
+• navigation;
+• terminology;
+• match-day views;
+• player views;
+• tables;
+• forms;
+• current template styling;
+• current responsive behavior where possible.
+The architectural rewrite should feel to the ordinary user like the existing application has gained
+shared persistence and login, not like an unrelated application has replaced it.
+────────────────────────────────────────
+10. Frontend Visibility and Permissions
+The frontend must respect application roles.
+Different users may see different actions while sharing the same underlying template.
+For example:
+anonymous
+login page / public information if allowed
+user
+normal tennis frontend
+read permitted application data
+perform explicitly permitted user actions
+editor
+normal tennis frontend
+additional editing controls
+admin
+normal tennis frontend
+full permitted frontend controls
+access to administration
+Do not rely on hidden buttons as authorization.
+All permissions must also be enforced by the backend.
+Frontend visibility is a usability mechanism.
+Backend authorization is the security mechanism.
+────────────────────────────────────────
+Tennis Multi-User Web Application — Implementation Prompt 7
+11. Admin Entry Point
+Provide a clear authenticated entry point such as:
+/admin
+The normal application remains under:
+/
+or the current route scheme.
+Only administrators may access /admin.
+Direct requests to admin APIs must independently verify admin authority.
+────────────────────────────────────────
+12. Authentication
+Use GitHub OAuth.
+GitHub provides identity only.
+Users must not need:
+• membership in a GitHub organization;
+• repository access;
+• GitHub team membership;
+• Fountain Coach infrastructure access.
+After successful OAuth:
+1. obtain the stable numeric GitHub account ID;
+2. find or create the corresponding local user;
+3. update display metadata;
+4. create a secure local session;
+5. resolve the local application role.
+Use the GitHub numeric user ID as the stable external identifier.
+A GitHub username may be stored as display metadata but must not be used as the sole security
+identity.
+────────────────────────────────────────
+13. Authorization Model
+Implement local roles.
+At minimum:
+admin
+editor
+user
+Admin
+Full application administration.
+Tennis Multi-User Web Application — Implementation Prompt 8
+Full CRUD over all manageable domain entities.
+Can manage application users and roles.
+Can access /admin.
+Editor
+Can edit tennis-domain content appropriate to normal operation.
+Cannot manage:
+• application administrators;
+• security configuration;
+• deployment;
+• privileged application settings unless explicitly authorized.
+User
+Can use the normal frontend and perform only explicitly permitted operations.
+Authorization rules must be implemented server-side.
+────────────────────────────────────────
+14. User Administration
+Admins must be able to:
+list users
+inspect user
+change role
+disable user
+re-enable user
+remove local application access
+Where useful, display:
+GitHub account ID
+GitHub username
+display name
+role
+created date
+last login
+active/disabled state
+Do not expose OAuth tokens or secrets.
+────────────────────────────────────────
+15. Environment Configuration
+Configure deployment through environment variables.
+Tennis Multi-User Web Application — Implementation Prompt 9
+Support at least:
+BASE_URL
+GITHUB_CLIENT_ID
+GITHUB_CLIENT_SECRET
+GITHUB_CALLBACK_URL
+SESSION_SECRET
+DATABASE_PATH
+INITIAL_ADMIN_GITHUB_ID
+Optionally support:
+INITIAL_ADMIN_GITHUB_IDS
+All secrets must remain server-side.
+Provide:
+.env.example
+with documentation but without real credentials.
+────────────────────────────────────────
+16. Initial Administrator Bootstrap
+A new installation must support deterministic creation of the first administrator.
+Recommended:
+INITIAL_ADMIN_GITHUB_ID=<numeric-github-user-id>
+When this account first authenticates, ensure it receives the local admin role.
+After initial provisioning, role management should primarily live in SQLite.
+Document the bootstrap behavior precisely.
+────────────────────────────────────────
+17. Session Security
+Implement secure application sessions.
+Production requirements:
+• HTTPS;
+• `HttpOnly` cookies;
+• `Secure` cookies;
+• appropriate `SameSite`;
+• OAuth state validation;
+• CSRF protection for state-changing requests where applicable;
+• session expiration;
+• logout;
+• secure random identifiers;
+Tennis Multi-User Web Application — Implementation Prompt 10
+• parameterized SQL;
+• server-side input validation.
+Do not trust browser-provided roles.
+Do not put OAuth client secrets into frontend code.
+────────────────────────────────────────
+18. Existing Data Migration
+The current browser-local data must be migratable.
+Implement a safe import path from the current application.
+Preferred sequence:
+legacy localStorage
+↓
+detect
+↓
+validate
+↓
+preview
+↓
+administrator confirms import
+↓
+transactional server-side import
+↓
+verification
+The migration must:
+1. detect existing data;
+2. understand the legacy schema;
+3. validate it;
+4. map it to relational entities;
+5. preserve relationships;
+6. import within a transaction;
+7. report failures;
+8. prevent duplicate imports;
+9. preserve/export the original source before destructive cleanup.
+Do not silently delete legacy data.
+────────────────────────────────────────
+19. Import and Export
+Provide full administrator import/export capability.
+Admins must be able to export application data in a portable form.
+At minimum provide:
+JSON export
+Optionally also provide:
+SQLite backup
+Tennis Multi-User Web Application — Implementation Prompt 11
+CSV export for selected entities
+Import must be validated before application.
+Document the format.
+The application should remain portable between installations.
+────────────────────────────────────────
+20. Search, Filtering and Lists
+Administration lists should support normal operational backend functionality.
+Where sensible provide:
+pagination
+search
+filtering
+sorting
+status filters
+relationship filters
+For example:
+Players
+search name
+filter team
+filter active/inactive
+Matches
+season
+match day
+player/team
+status
+Users
+role
+enabled/disabled
+Do not over-engineer very small datasets, but build the API so list endpoints can evolve.
+────────────────────────────────────────
+21. Validation
+Move authoritative validation to the backend.
+Frontend validation should improve usability but cannot be trusted.
+Validate:
+• required values;
+• numeric ranges;
+• dates;
+• valid relationships;
+• enum/status values;
+• uniqueness;
+• domain-specific tennis constraints.
+Return structured error responses usable by the current frontend template.
+Tennis Multi-User Web Application — Implementation Prompt 12
+────────────────────────────────────────
+22. Referential Integrity
+Explicitly design deletion behavior.
+For each entity determine whether deletion is:
+hard delete
+soft delete
+archive
+forbidden while referenced
+cascade
+Document the rule.
+Do not accidentally cascade-delete historical match information.
+Historical tennis records should generally remain internally consistent.
+────────────────────────────────────────
+23. Auditability
+For important domain changes, preserve enough metadata to determine:
+who changed it
+when it changed
+At minimum this should cover:
+• results;
+• match data;
+• season structure;
+• user roles;
+• administrative corrections.
+A full event-sourcing architecture is not required.
+Keep it proportionate.
+────────────────────────────────────────
+24. Multi-User Correctness
+Audit every former single-browser assumption.
+The system must support multiple simultaneously authenticated users.
+Use transactions where related changes must be atomic.
+Consider optimistic concurrency for records where silent overwrite could create incorrect data.
+For example:
+version
+updated_at
+A stale edit should return a conflict when appropriate rather than silently replacing newer data.
+────────────────────────────────────────
+Tennis Multi-User Web Application — Implementation Prompt 13
+25. No Browser Database as Source of Truth
+The authoritative model is:
+server SQLite
+=
+application truth
+Browser storage may be used for:
+• cached preferences;
+• temporary state;
+• performance caching.
+It must not be the authoritative persistence mechanism for shared tennis-domain data.
+Do not introduce browser SQLite synchronization unless explicitly required later.
+────────────────────────────────────────
+26. Deployment
+The application must remain independently deployable.
+Expected ownership model:
+public GitHub repository
+↓
+CI/CD
+↓
+independent webspace
+↓
+frontend + backend
+↓
+SQLite
+The project must not depend on Fountain Coach organization membership.
+The repository must be transferable to another personal GitHub account.
+After transfer, the new owner should be able to operate the application by configuring the
+documented environment/secrets.
+────────────────────────────────────────
+27. GitHub Actions
+Where deployment automation exists, use GitHub Actions cleanly.
+Production secrets should live in GitHub Secrets or environment secrets.
+Examples:
+GITHUB_CLIENT_SECRET
+SESSION_SECRET
+DEPLOY_HOST
+DEPLOY_USER
+DEPLOY_KEY
+Never echo secrets into logs.
+Tennis Multi-User Web Application — Implementation Prompt 14
+Never package real .env files into public build artifacts.
+────────────────────────────────────────
+28. Database Operations
+Provide operational commands or documented procedures for:
+migrate
+backup
+restore
+integrity-check
+Backups must be safe with SQLite WAL operation.
+The application must fail clearly rather than silently recreating an incompatible production database.
+────────────────────────────────────────
+29. Health and Logging
+Provide:
+GET /health
+It should confirm application and database availability without leaking sensitive information.
+Implement useful server logs for:
+• startup;
+• migrations;
+• authentication;
+• authorization failures;
+• failed CRUD operations;
+• database errors;
+• application exceptions.
+Never log:
+• OAuth client secrets;
+• session secrets;
+• access tokens;
+• cookies.
+────────────────────────────────────────
+30. Testing
+Add automated tests.
+CRUD tests
+Every entity must have tests for:
+create
+read
+update
+Tennis Multi-User Web Application — Implementation Prompt 15
+delete/archive
+Test relational constraints.
+Authentication
+Test:
+• unauthenticated access;
+• OAuth callback flow using mocks;
+• session creation;
+• session expiration;
+• logout.
+Authorization
+Test:
+admin → complete CRUD
+editor → allowed editor actions
+user → allowed user actions
+unauthenticated → rejected
+Explicitly test privilege escalation attempts.
+Frontend
+Verify the current user template continues to function with API-backed data.
+Admin
+Verify /admin CRUD workflows.
+Migration
+Test representative legacy localStorage datasets.
+Multi-user
+Test simultaneous independent sessions against the same database.
+────────────────────────────────────────
+31. Documentation
+Update the README for a new owner.
+Document:
+Development
+clone
+configure environment
+install dependencies
+create OAuth app
+migrate database
+run server
+Tennis Multi-User Web Application — Implementation Prompt 16
+run frontend
+Production
+Document:
+• environment variables;
+• GitHub OAuth setup;
+• callback URL;
+• database location;
+• session configuration;
+• initial admin;
+• deployment;
+• backup;
+• restore.
+Administration
+Document:
+/admin
+user management
+role management
+CRUD operations
+import/export
+Ownership Transfer
+Document what must be reviewed when ownership changes:
+GitHub OAuth ownership/configuration
+repository secrets
+deployment credentials
+domain/DNS
+BASE_URL
+GITHUB_CALLBACK_URL
+SESSION_SECRET
+initial administrator
+hosting ownership
+────────────────────────────────────────
+32. Explicit Authority Boundaries
+Maintain these distinctions:
+GitHub
+identifies a person
+Tennis user account
+represents that person inside the application
+Tennis role
+determines application authority
+Tennis Multi-User Web Application — Implementation Prompt 17
+Tennis admin
+administers the application
+GitHub repository owner
+owns source/repository configuration
+Hosting administrator
+operates infrastructure
+These roles may belong to the same person, but the implementation must not assume that they do.
+────────────────────────────────────────
+33. Required Admin Experience
+An administrator should be able to log into the deployed application, visit:
+/admin
+and operate the entire tennis application without:
+• editing JSON manually;
+• accessing SQLite directly;
+• opening a server shell;
+• modifying source code;
+• changing GitHub repository contents.
+The admin interface is therefore an operational requirement, not an optional developer convenience.
+────────────────────────────────────────
+34. Required User Experience
+A normal user should:
+1. open the web application;
+2. authenticate if required;
+3. arrive in the existing/current tennis frontend;
+4. see the same conceptual application they already know;
+5. see shared current data;
+6. have actions shown according to their role;
+7. save changes through the backend;
+8. see changes made by other authorized users after normal refresh/reload mechanisms.
+The current template must remain recognizable.
+Do not expose backend implementation concepts unnecessarily to normal users.
+────────────────────────────────────────
+35. Definition of Done
+Do not declare the migration complete until all of the following are true:
+• the application is a multi-user web application;
+Tennis Multi-User Web Application — Implementation Prompt 18
+• the current frontend template remains in use;
+• existing functionality has been preserved;
+• server-side SQLite is authoritative;
+• browser localStorage is no longer authoritative;
+• GitHub OAuth works;
+• local application roles work;
+• `/admin` exists;
+• admin access is protected;
+• every persistent entity has full CRUD or a documented domain-safe delete/archive equivalent;
+• admin users can manage all entities through the web interface;
+• normal frontend users see the appropriate current-template views;
+• role-sensitive frontend controls work;
+• server-side authorization independently protects every write;
+• user management works;
+• data import/export works;
+• legacy local data can be migrated;
+• multi-user edits operate against shared state;
+• relational integrity is enforced;
+• database migrations exist;
+• backup/restore works;
+• tests cover CRUD, auth, roles, migration, and critical tennis behavior;
+• deployment is reproducible;
+• no secrets are committed;
+• another repository owner can take over the application using the documentation.
+────────────────────────────────────────
+36. Implementation Procedure
+Proceed in this order.
+1. Inspect the complete current repository.
+2. Run the existing application.
+3. Inventory all frontend functionality.
+4. Inventory every persistent entity.
+5. Inventory all localStorage data structures.
+6. Create an entity/relationship diagram.
+7. Define the SQLite schema.
+8. Define CRUD API contracts.
+9. Define role permissions.
+10. Implement database migrations.
+11. Implement backend persistence.
+12. Implement authentication.
+13. Implement authorization.
+14. Replace localStorage calls with API access incrementally.
+15. Preserve the existing frontend template during integration.
+16. Build `/admin`.
+Tennis Multi-User Web Application — Implementation Prompt 19
+17. Implement complete CRUD management screens.
+18. Implement user/role administration.
+19. Implement legacy import.
+20. Implement application export.
+21. Add operational database commands.
+22. Test two or more simultaneous users.
+23. Test complete CRUD for every entity.
+24. Test permissions with admin/editor/user accounts.
+25. Test database backup and restore.
+26. Perform a clean production installation using only the documentation.
+27. Report any unresolved incompatibility rather than silently dropping functionality.
+────────────────────────────────────────
+Final Architectural Goal
+Transform:
+single-user browser application
+browser UI
++
+localStorage
+into:
+independently hosted multi-user tennis web application
+Current Tennis Frontend
+│
+├── normal users
+├── editors
+└── admins
+│
+▼
+Authenticated API
+│
+▼
+Tennis Backend
+│
+├── complete CRUD
+├── validation
+├── authorization
+├── user management
+└── administration
+│
+▼
+Server SQLite
+The application must retain the existing user-facing template while gaining a complete conventional
+backend and administrative layer.
+The final product should be independently ownable, transferable, understandable, maintainable, and
+usable by ordinary frontend users and application administrators without developer intervention.
+Tennis Multi-User Web Application — Implementation Prompt 20

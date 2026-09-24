@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tennis Multi-User Web App"
+  short_description: "Implement the FCIS-governed Tennis backend migration"
+  default_prompt: "Use $tennis-multi-user-webapp to implement one bounded, tested migration slice while preserving current tennis behavior."
