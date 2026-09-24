@@ -20,9 +20,49 @@ let currentRole = null;
 function applyRole(role) {
   currentRole = role;
   const player = role === 'player';
-  document.querySelectorAll('#generate, #import-local, #reset, [data-tab="players"], #players').forEach(element => { element.hidden = player; });
+  document.querySelectorAll('#generate, #import-local, #reset, #export-json, #import-json, [data-tab="players"], #players').forEach(element => { element.hidden = player; });
   document.body.classList.toggle('player-mode', player);
   $('#connection').textContent = player ? 'ANGEMELDET · persönlicher Spielplan' : 'ANGEMELDET · gemeinsamer Spielplan';
+}
+
+function ensurePortableMigrationControls() {
+  const actions = $('.top-actions');
+  if (!actions || $('#export-json')) return;
+  const exportButton = document.createElement('button');
+  exportButton.id = 'export-json';
+  exportButton.textContent = 'Daten exportieren';
+  const importButton = document.createElement('button');
+  importButton.id = 'import-json';
+  importButton.textContent = 'Daten importieren';
+  const input = document.createElement('input');
+  input.id = 'import-json-file';
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.hidden = true;
+  actions.append(exportButton, importButton, input);
+  exportButton.addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(localSnapshot(), null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob), link = document.createElement('a');
+    link.href = url; link.download = 'fountain-coach-tennisrunde.json'; link.click(); URL.revokeObjectURL(url);
+    toast('Tennisdaten exportiert.');
+  });
+  importButton.addEventListener('click', () => input.click());
+  input.addEventListener('change', async () => {
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    try {
+      const imported = JSON.parse(await file.text());
+      if (!imported || typeof imported !== 'object' || Array.isArray(imported) || !Array.isArray(imported.players) || !Array.isArray(imported.schedule)) throw new Error('Die JSON-Datei ist kein gültiger Tennis-Spielstand.');
+      if (remoteMode) {
+        if (!confirm('Exportierte Tennisdaten in den gemeinsamen Spielplan importieren? Vorhandene Online-Daten werden ersetzt.')) return;
+        await remoteOperation('import_state', { confirm: true, state: imported });
+      } else {
+        players = imported.players; schedule = imported.schedule; configuration = imported.configuration || configuration; save(); render();
+      }
+      toast('Tennisdaten importiert.');
+    } catch (error) { toast(error.message || 'JSON-Import fehlgeschlagen.', true); }
+  });
 }
 
 function save() {
@@ -270,4 +310,5 @@ $('#export').addEventListener('click', () => {
   const blob = new Blob([bytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), url = URL.createObjectURL(blob), link = document.createElement('a'); link.href = url; link.download = 'fountain-coach-tennisrunde.xlsx'; link.click(); URL.revokeObjectURL(url); toast('Excel-Datei exportiert.');
 });
 render();
+ensurePortableMigrationControls();
 enforceAppGate();

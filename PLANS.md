@@ -257,3 +257,17 @@ participant data was added to the public repository or production configuration 
 Proof: player OAuth/session contract, filtered state contract, rejected player mutation, full application tests, MCP and
 remote authority contracts, syntax checks, privacy/diff checks. This is a read-only identity seam; player onboarding,
 consent, notifications, and richer member administration remain separate work.
+
+## Current bounded change — portable desktop-data migration (2026-09-24)
+
+Capability: move the self-contained desktop application's private tennis data into the server authority without
+requiring player identities or copying private browser storage by hand.
+
+Implementation result: the authenticated organizer UI now offers a JSON data export and file import. The export
+contains only the current tennis state; import validates the object shape, requires the existing explicit confirmation
+when replacing server data, and uses the existing transactional `import_state` boundary. No participant data is
+checked into Git or added to production by this slice.
+
+Proof: portable migration browser-source assertion, existing import authority tests, full application tests, MCP and
+remote authority contracts, syntax checks, privacy/diff checks. The operator must still review the file and confirm the
+replacement; player identity mapping remains separate.
