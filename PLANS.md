@@ -219,3 +219,13 @@ revision `77c51fb0a91af3c5206eb5adf912c4a02f6f1769`.
 Proof: GitHub consent screen reached with the exact production callback, callback completed successfully, Safari opened
 `/app/`, and the live UI reported `ANGEMELDET · gemeinsamer Spielplan`. ChatGPT/MCP account consent remains a separate
 acceptance flow.
+
+## Current bounded change — prepare ChatGPT MCP connection (2026-09-24)
+
+Implementation result: verified the public MCP resource metadata, authorization-server metadata, PKCE support, dynamic
+registration contract, refresh-token grant declaration, and unauthenticated `/mcp` challenge. The repository now
+documents the exact ChatGPT Developer Mode endpoint and the explicit read-before-write acceptance sequence.
+
+Remaining external action: create the Custom App in ChatGPT Developer Mode using
+`https://tennis.fountain.coach/mcp`, complete the OAuth consent prompt, and exercise one read-only tool before any
+confirmed write. ChatGPT owns that dynamic client registration and cannot be completed by a repository deploy alone.
