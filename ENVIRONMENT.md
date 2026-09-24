@@ -91,7 +91,7 @@ Direct live development is governed by release housekeeping:
 
 ## Live release witness
 
-The first customer-facing release was activated on 2026-09-24 from revision `5ea2d97b2dfbf18325f2ec0421133870e5786359`.
+The current customer-facing release was activated on 2026-09-24 from revision `77c51fb0a91af3c5206eb5adf912c4a02f6f1769`.
 The release is installed under `/opt/tennis/releases/<revision>`, selected through `/opt/tennis/active`, and served by
 Caddy in front of the private Node listener. SQLite is mounted through the named production volume and the prior
 release is retained for rollback.

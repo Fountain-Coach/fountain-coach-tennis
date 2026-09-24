@@ -209,3 +209,13 @@ pre-change database snapshots.
 
 Remaining separate acceptance: complete an interactive GitHub sign-in and prove the intended ChatGPT/MCP account
 connection. That is an identity/capability witness, not a prerequisite for the public landing or health route.
+
+## Current bounded change — repair live GitHub OAuth (2026-09-24)
+
+Implementation result: corrected production to use the registered `Fountain Coach Tennis` OAuth application, rotated
+its client secret through the protected stores, requested GitHub’s JSON token response explicitly, and redeployed
+revision `77c51fb0a91af3c5206eb5adf912c4a02f6f1769`.
+
+Proof: GitHub consent screen reached with the exact production callback, callback completed successfully, Safari opened
+`/app/`, and the live UI reported `ANGEMELDET · gemeinsamer Spielplan`. ChatGPT/MCP account consent remains a separate
+acceptance flow.
