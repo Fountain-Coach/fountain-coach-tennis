@@ -103,7 +103,9 @@ export function beginOAuth(name, env = process.env) {
 export function beginOAuthWithContext(name, context, env = process.env) {
   const challenge = createOAuthChallenge();
   pendingChallenges.set(challenge.state, { name, challenge, context, expiresAt: Date.now() + challengeLifetimeMs });
-  return Object.freeze({ provider: name, state: challenge.state, authorizationUrl: buildAuthorizationUrl(name, challenge, env) });
+  const authorizationUrl = new URL(buildAuthorizationUrl(name, challenge, env));
+  if (context?.resource) authorizationUrl.searchParams.set('resource', context.resource);
+  return Object.freeze({ provider: name, state: challenge.state, authorizationUrl: authorizationUrl.toString() });
 }
 
 export async function exchangeAndVerify(name, { code, codeVerifier, state, expectedState, nonce }, env = process.env, fetchImpl = fetch) {
@@ -245,7 +247,7 @@ export function registerOAuthClient({ redirectUris, clientName } = {}) {
   return Object.freeze({ client_id: clientId, client_name: String(clientName || 'ChatGPT'), redirect_uris: [...new Set(redirectUris)], token_endpoint_auth_method: 'none', grant_types: ['authorization_code', 'refresh_token'], response_types: ['code'] });
 }
 
-export function authorizeOAuthRequest({ clientId, redirectUri, state, codeChallenge, codeChallengeMethod = 'S256', scope = 'openid offline_access' } = {}, env = process.env) {
+export function authorizeOAuthRequest({ clientId, redirectUri, state, codeChallenge, codeChallengeMethod = 'S256', scope = 'openid offline_access', resource } = {}, env = process.env) {
   const client = clients.get(clientId);
   if (!client || !client.redirectUris.includes(redirectUri) || !state || !codeChallenge || codeChallengeMethod !== 'S256') throw new Error('OAuth authorization request rejected.');
   const allowedScopes = new Set(['openid', 'offline_access', 'tennis.read', 'tennis.write']);
@@ -253,7 +255,7 @@ export function authorizeOAuthRequest({ clientId, redirectUri, state, codeChalle
   if (requestedScopes.some(value => !allowedScopes.has(value))) throw new Error('OAuth scope request rejected.');
   const provider = String(env.OAUTH_IDP || 'google');
   requireOAuthProvider(provider, env);
-  return beginOAuthWithContext(provider, { clientId, redirectUri, state, codeChallenge, scope: requestedScopes.join(' ') }, env);
+  return beginOAuthWithContext(provider, { clientId, redirectUri, state, codeChallenge, scope: requestedScopes.join(' '), resource }, env);
 }
 
 export function completeOAuthAuthorization(identity, context, env = process.env) {
@@ -277,37 +279,37 @@ export function approveOAuthConsent(consentToken, identity, env = process.env) {
   return Object.freeze({ code: completeOAuthAuthorization(identity, request.context, env), context: request.context });
 }
 
-export function exchangeAuthorizationCode({ code, clientId, redirectUri, codeVerifier } = {}) {
+export function exchangeAuthorizationCode({ code, clientId, redirectUri, codeVerifier, resource } = {}) {
   const grant = authorizationCodes.get(code);
   authorizationCodes.delete(code);
-  if (!grant || grant.expiresAt <= Date.now() || grant.clientId !== clientId || grant.redirectUri !== redirectUri || !codeVerifier) throw new Error('OAuth authorization code rejected.');
+  if (!grant || grant.expiresAt <= Date.now() || grant.clientId !== clientId || grant.redirectUri !== redirectUri || (grant.resource && grant.resource !== resource) || !codeVerifier) throw new Error('OAuth authorization code rejected.');
   const verifierChallenge = base64Url(createHash('sha256').update(codeVerifier).digest());
   if (!sameSecret(verifierChallenge, grant.codeChallenge)) throw new Error('OAuth PKCE verification failed.');
   const accessToken = base64Url(randomBytes(32));
   const refreshToken = base64Url(randomBytes(40));
   const expiresAt = Date.now() + accessTokenLifetimeMs;
-  accessTokens.set(accessToken, { identity: grant.identity, clientId, scope: grant.scope, expiresAt });
-  refreshTokens.set(refreshToken, { identity: grant.identity, clientId, scope: grant.scope, expiresAt: Date.now() + refreshTokenLifetimeMs });
-  return { access_token: accessToken, token_type: 'Bearer', expires_in: Math.floor(accessTokenLifetimeMs / 1000), refresh_token: refreshToken, scope: grant.scope };
+  accessTokens.set(accessToken, { identity: grant.identity, clientId, resource: grant.resource, scope: grant.scope, expiresAt });
+  refreshTokens.set(refreshToken, { identity: grant.identity, clientId, resource: grant.resource, scope: grant.scope, expiresAt: Date.now() + refreshTokenLifetimeMs });
+  return { access_token: accessToken, token_type: 'Bearer', expires_in: Math.floor(accessTokenLifetimeMs / 1000), refresh_token: refreshToken, scope: grant.scope, ...(grant.resource ? { resource: grant.resource } : {}) };
 }
 
-export function refreshOAuthToken({ refreshToken, clientId } = {}) {
+export function refreshOAuthToken({ refreshToken, clientId, resource } = {}) {
   const grant = refreshTokens.get(refreshToken);
-  if (!grant || grant.expiresAt <= Date.now() || grant.clientId !== clientId) throw new Error('OAuth refresh token rejected.');
+  if (!grant || grant.expiresAt <= Date.now() || grant.clientId !== clientId || (grant.resource && grant.resource !== resource)) throw new Error('OAuth refresh token rejected.');
   const accessToken = base64Url(randomBytes(32));
-  accessTokens.set(accessToken, { identity: grant.identity, clientId, scope: grant.scope, expiresAt: Date.now() + accessTokenLifetimeMs });
-  return { access_token: accessToken, token_type: 'Bearer', expires_in: Math.floor(accessTokenLifetimeMs / 1000), scope: grant.scope };
+  accessTokens.set(accessToken, { identity: grant.identity, clientId, resource: grant.resource, scope: grant.scope, expiresAt: Date.now() + accessTokenLifetimeMs });
+  return { access_token: accessToken, token_type: 'Bearer', expires_in: Math.floor(accessTokenLifetimeMs / 1000), scope: grant.scope, ...(grant.resource ? { resource: grant.resource } : {}) };
 }
 
 export function readOAuthAccessToken(token) {
   const grant = accessTokens.get(token);
   if (!grant || grant.expiresAt <= Date.now()) { if (token) accessTokens.delete(token); return null; }
-  return Object.freeze({ ...grant.identity, scope: grant.scope, expiresAt: grant.expiresAt });
+  return Object.freeze({ ...grant.identity, resource: grant.resource, scope: grant.scope, expiresAt: grant.expiresAt });
 }
 
 export function oauthMetadata(baseUrl) {
   const issuer = String(baseUrl).replace(/\/$/, '');
-  return { issuer, authorization_endpoint: `${issuer}/oauth/authorize`, token_endpoint: `${issuer}/oauth/token`, registration_endpoint: `${issuer}/oauth/register`, response_types_supported: ['code'], grant_types_supported: ['authorization_code', 'refresh_token'], code_challenge_methods_supported: ['S256'], token_endpoint_auth_methods_supported: ['none'], scopes_supported: ['openid', 'offline_access', 'tennis.read', 'tennis.write'] };
+  return { issuer, authorization_endpoint: `${issuer}/oauth/authorize`, token_endpoint: `${issuer}/oauth/token`, registration_endpoint: `${issuer}/oauth/register`, response_types_supported: ['code'], grant_types_supported: ['authorization_code', 'refresh_token'], code_challenge_methods_supported: ['S256'], token_endpoint_auth_methods_supported: ['none'], resource_parameter_supported: true, scopes_supported: ['openid', 'offline_access', 'tennis.read', 'tennis.write'] };
 }
 
 export function protectedResourceMetadata(baseUrl) {

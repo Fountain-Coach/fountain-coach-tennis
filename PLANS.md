@@ -178,6 +178,19 @@ Implementation result: Hetzner server `167276345` is running in Nürnberg as `cx
 disk) with Ubuntu 24.04, public IPv4 `188.245.29.232`, firewall `11673798`, and the admitted administrator SSH key.
 The host was read back over SSH as Ubuntu 24.04 with 35 GB root capacity available and only SSH listening.
 
+## Current bounded change — repair ChatGPT MCP discovery behind Caddy (2026-09-24)
+
+Capability: make the ChatGPT custom-app form complete its protected MCP scan without changing the customer-facing
+landing route or bypassing OAuth.
+
+Implementation result: the Express service now trusts the single Caddy proxy hop required by the rate limiter;
+OAuth authorization, token, and refresh requests preserve ChatGPT's `resource` parameter; issued bearer tokens carry
+that audience and are rejected when presented for another MCP resource; protected-resource challenges advertise the
+required read/write scopes. Focused application, MCP contract, syntax, and diff checks pass.
+
+Acceptance boundary: this proves the server-side compatibility contract. The final ChatGPT workspace/app creation and
+user consent still have to be completed in ChatGPT's web administration UI.
+
 Proof: [`ENVIRONMENT.md`](ENVIRONMENT.md),
 [`docs/history-first/hcloud-provisioning-vinegarium-20260924.md`](docs/history-first/hcloud-provisioning-vinegarium-20260924.md),
 Hetzner read-back, and SSH host read-back. Remaining gates are DNS, Caddy/TLS, application release, SQLite backup

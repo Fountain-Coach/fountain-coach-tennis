@@ -28,10 +28,13 @@ from ChatGPT Developer Mode because ChatGPT must own the dynamic client registra
 In ChatGPT Developer Mode, create a Custom App with the deployed HTTPS MCP endpoint
 `https://tennis.fountain.coach/mcp`. Let ChatGPT scan the endpoint and choose OAuth when prompted. The app is served
 over HTTPS and exposes the OAuth authorization-code flow (PKCE, dynamic client registration, explicit admin consent,
-and refresh tokens). The admin identity must be listed in
+resource/audience propagation, and refresh tokens). The admin identity must be listed in
 `TENNIS_ADMIN_EMAILS` or `OAUTH_ADMIN_EMAILS`. A static bearer credential remains only an owner-approved compatibility
 lane. Mutating tool calls require the `tennis.write` scope and `confirm: true`; the user must approve the mutation at
 the ChatGPT boundary before that flag is sent. The URL of the human web app is not itself an action endpoint.
+
+The server also trusts exactly one reverse-proxy hop for Caddy's forwarded client address. This is required for the
+rate limiter to operate correctly behind the production edge; it does not grant the proxy application access.
 
 After ChatGPT completes OAuth, verify the app can call the read-only MCP tools before testing writes. Approve each
 write confirmation explicitly; do not paste GitHub client secrets or bearer tokens into ChatGPT configuration.

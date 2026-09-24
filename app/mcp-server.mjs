@@ -77,7 +77,8 @@ function authorized(request, write = false) {
   const expected = `Bearer ${bearerToken}`;
   if (bearerToken && received.length === expected.length && timingSafeEqual(Buffer.from(received), Buffer.from(expected))) return { mode: 'static', scope: 'tennis.read tennis.write' };
   const token = received.startsWith('Bearer ') ? readOAuthAccessToken(received.slice(7)) : null;
-  if (token && (!write || token.scope.split(' ').includes('tennis.write'))) return { mode: 'oauth', ...token };
+  const expectedResource = `${publicBaseUrl(request)}/mcp`;
+  if (token && (!token.resource || token.resource === expectedResource) && (!write || token.scope.split(' ').includes('tennis.write'))) return { mode: 'oauth', ...token };
   const session = readOAuthSession(cookies(request).tennis_oauth_session);
   if (session && isAdminIdentity(session, process.env)) return { mode: 'oauth-session', ...session, scope: 'tennis.read tennis.write' };
   return !bearerToken && !write && process.env.TENNIS_ALLOW_ANONYMOUS_READ === '1' ? { mode: 'development' } : null;
@@ -153,6 +154,7 @@ function createServer() {
 
 const app = express();
 app.disable('x-powered-by');
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '20kb' }));
 app.use((request, response, next) => {
@@ -188,7 +190,8 @@ app.get('/oauth/authorize', (request, response) => {
       state: request.query.state,
       codeChallenge: request.query.code_challenge,
       codeChallengeMethod: request.query.code_challenge_method,
-      scope: request.query.scope
+      scope: request.query.scope,
+      resource: request.query.resource
     };
     const session = readOAuthSession(cookies(request).tennis_oauth_session);
     if (session) {
@@ -202,8 +205,8 @@ app.post('/oauth/token', (request, response) => {
   try {
     const body = request.body || {};
     const token = body.grant_type === 'refresh_token'
-      ? refreshOAuthToken({ refreshToken: body.refresh_token, clientId: body.client_id })
-      : exchangeAuthorizationCode({ code: body.code, clientId: body.client_id, redirectUri: body.redirect_uri, codeVerifier: body.code_verifier });
+      ? refreshOAuthToken({ refreshToken: body.refresh_token, clientId: body.client_id, resource: body.resource })
+      : exchangeAuthorizationCode({ code: body.code, clientId: body.client_id, redirectUri: body.redirect_uri, codeVerifier: body.code_verifier, resource: body.resource });
     response.setHeader('Cache-Control', 'no-store');
     response.json(token);
   } catch (error) { response.status(400).json({ error: 'invalid_grant', error_description: error.message }); }
@@ -295,11 +298,11 @@ app.get(['/app', '/app/'], (request, response, next) => {
 app.get(['/app', '/app/'], (request, response) => response.sendFile(resolve(staticRoot, 'app.html')));
 app.get('/healthz', (request, response) => response.json({ ok: true, service: 'fountain-coach-tennis' }));
 app.get('/api/state', apiLimiter, async (request, response) => {
-  if (!authorized(request)) return response.status(401).set('WWW-Authenticate', `Bearer resource_metadata="${publicBaseUrl(request)}/.well-known/oauth-protected-resource/mcp"`).json({ error: 'Bearer authentication required.' });
+  if (!authorized(request)) return response.status(401).set('WWW-Authenticate', `Bearer resource_metadata="${publicBaseUrl(request)}/.well-known/oauth-protected-resource/mcp", scope="tennis.read tennis.write"`).json({ error: 'Bearer authentication required.' });
   response.json(nativeBridgeUrl ? await nativeModel() : readModel(await authority.load()));
 });
 app.post('/api/operation', apiLimiter, async (request, response) => {
-  if (!authorized(request, true)) return response.status(401).set('WWW-Authenticate', `Bearer resource_metadata="${publicBaseUrl(request)}/.well-known/oauth-protected-resource/mcp"`).json({ error: 'Bearer authentication required.' });
+  if (!authorized(request, true)) return response.status(401).set('WWW-Authenticate', `Bearer resource_metadata="${publicBaseUrl(request)}/.well-known/oauth-protected-resource/mcp", scope="tennis.read tennis.write"`).json({ error: 'Bearer authentication required.' });
   const { operation, input } = request.body || {};
   if (typeof operation !== 'string' || !input || typeof input !== 'object' || Array.isArray(input)) {
     return response.status(400).json({ error: 'operation and object input are required.' });
@@ -321,7 +324,7 @@ app.use('/app', express.static(staticRoot, { index: 'index.html', dotfiles: 'all
 app.use(express.static(publicRoot, { index: 'index.html', dotfiles: 'allow' }));
 
 app.all('/mcp', mcpLimiter, async (request, response) => {
-  if (!authorized(request, request.method !== 'GET')) return response.status(401).set('WWW-Authenticate', `Bearer resource_metadata="${publicBaseUrl(request)}/.well-known/oauth-protected-resource/mcp"`).json({ error: 'Bearer authentication required.' });
+  if (!authorized(request, request.method !== 'GET')) return response.status(401).set('WWW-Authenticate', `Bearer resource_metadata="${publicBaseUrl(request)}/.well-known/oauth-protected-resource/mcp", scope="tennis.read tennis.write"`).json({ error: 'Bearer authentication required.' });
   const sessionId = request.headers['mcp-session-id'];
   let transport = sessionId ? transports.get(sessionId) : null;
   if (!transport && request.method === 'POST' && isInitializeRequest(request.body)) {
