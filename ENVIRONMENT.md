@@ -66,6 +66,24 @@ The dedicated production host was provisioned on 2026-09-24 and is recorded in
 This proves provisioning and base-host access only. It does not prove that `tennis.fountain.coach` resolves to this
 address, that Caddy or Tennis is installed, that TLS is active, or that OAuth/MCP is connected.
 
+## Operating model: single live intranet host
+
+The canonical publishing domain remains `tennis.fountain.coach`. Because this is an owner-controlled intranet
+application, a separate always-on staging host is optional rather than required. `vinegarium` is the planned live
+development and production host; the LAN Docker deployment remains available as a disposable preflight witness.
+
+Direct live development is governed by release housekeeping:
+
+- every release has one source revision and a versioned remote directory;
+- the new process is health-checked before traffic switches;
+- Caddy remains the only public edge and the Node listener remains private;
+- the previous release stays available for immediate rollback;
+- SQLite is backed up before schema/data changes and retained off-host according to the recovery policy;
+- old releases, logs, and temporary archives are bounded and pruned only after a successful read-back;
+- OS, Caddy, Node, OAuth, database, disk, backup, and certificate health are checked separately.
+
+“No staging” therefore means no duplicate production-like server, not an in-place overwrite of the running service.
+
 ## Release boundary
 
 This file describes the intended host, not a deployment mechanism. A GitHub push is source synchronization, not

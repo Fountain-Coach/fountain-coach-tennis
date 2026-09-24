@@ -182,3 +182,19 @@ Proof: [`ENVIRONMENT.md`](ENVIRONMENT.md),
 [`docs/history-first/hcloud-provisioning-vinegarium-20260924.md`](docs/history-first/hcloud-provisioning-vinegarium-20260924.md),
 Hetzner read-back, and SSH host read-back. Remaining gates are DNS, Caddy/TLS, application release, SQLite backup
 posture, GitHub OAuth, and ChatGPT/MCP acceptance.
+
+## Next bounded change — single-host live release housekeeping
+
+Capability: operate the owner-controlled intranet app directly on `vinegarium` while keeping
+`tennis.fountain.coach` as the only publishing domain and avoiding a mandatory duplicate staging host.
+
+Plan: add the admitted live-release adapter for the existing deployer. It must package a clean pinned revision, create a
+versioned release, inject opaque SecretStore-backed runtime configuration, start a private Node service, validate health,
+switch Caddy atomically, read back the public domain and release digest, retain the previous release, and provide
+bounded rollback. SQLite backup/restore and housekeeping retention are release gates for schema/data changes.
+
+Non-goal: hot-editing the active directory, exposing Node publicly, sharing `vinegarium` with EstatePublisher or other
+customer workloads, or treating the LAN Docker deployment as production.
+
+Proof gate: exact host/domain/source receipt, Caddy/TLS witness, private listener witness, application health/read-back,
+release digest, backup/rollback evidence, bounded retention check, GitHub OAuth acceptance, and ChatGPT/MCP acceptance.

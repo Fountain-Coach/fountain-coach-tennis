@@ -30,6 +30,16 @@ git check-ignore .env
 node deploy/tennis-deploy.mjs verify
 ```
 
+## Live intranet configuration
+
+The canonical live host is `vinegarium` and the canonical publishing domain is `tennis.fountain.coach`. A separate
+staging host is optional for this owner-controlled intranet application. The LAN Docker deployment may still be used
+as a disposable preflight, but it is not required before every live release.
+
+Live releases must remain atomic: package one clean revision, install it beside the active release, start and health
+check it privately, switch Caddy, retain the previous release for rollback, and prune only after read-back succeeds.
+Never overwrite the active directory or expose the Node listener directly.
+
 ## Production configuration
 
 Create a GitHub Environment named `production` in the repository settings. Protect it with required reviewers and
