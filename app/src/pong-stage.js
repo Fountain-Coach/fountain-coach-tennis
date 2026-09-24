@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
-import Csound from "@csound/browser";
 
 const canvas = document.querySelector("#pong-canvas");
 const stage = document.querySelector("#pong-stage");
@@ -121,11 +120,13 @@ scene.add(ball);
 
 let audioContext;
 let csound;
+let Csound;
 const orchestra = `sr=48000\nksmps=64\nnchnls=2\n0dbfs=1\nmassign 0,1\ninstr 1\n iFreq=cpsmidinn(p4)\n aEnv expon .45,.12,.001\n aSig oscili(aEnv,iFreq)\n outs aSig,aSig\nendin`;
 async function enableAudio() {
   if (csound) return;
   audioContext = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: "interactive" });
   await audioContext.resume();
+  Csound ??= (await import("@csound/browser")).default;
   csound = await Csound({ audioContext, autoConnect: false, useWorker: false });
   await csound.setOption("-odac");
   await csound.setOption("-m0");
