@@ -29,3 +29,10 @@ No unestablished item is claimed as complete by this audit.
 - WebKit accessibility/DOM semantics and fixed-viewport snapshots are the user-facing acceptance authorities.
 - Estate-only Store publication, Reframe/FountainStore prerequisites, Governance numbering, and estate shell rules
   remain explicitly fenced from ordinary tennis development.
+
+## Root environment
+
+The intended target is documented in [`ENVIRONMENT.md`](ENVIRONMENT.md): a dedicated HCloud/Hetzner Cloud Ubuntu LTS
+VM, Caddy-only public ingress, one private Tennis service, and server-side SQLite. This is a target contract, not
+live provisioning evidence. HCloud VM identity, Caddy/TLS readiness, application health, persistence, backups, and
+rollback remain unestablished until a native service-release operation proves them.

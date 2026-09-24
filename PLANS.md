@@ -32,6 +32,21 @@ Proof gate: the updated `AGENTS.md` and tennis skill classify application work, 
 infrastructure verification, and WebKit AX/VRT acceptance; focused app tests, privacy checks, and `git diff --check`
 pass; the change is committed and pushed to `main`.
 
+## Current bounded change — define the HCloud root environment (2026-09-24)
+
+Capability: make the intended production environment explicit without claiming that it is provisioned.
+
+Target: one dedicated HCloud/Hetzner Cloud Ubuntu LTS VM, the smallest eligible profile with measured headroom,
+Caddy as the only public edge for `tennis.fountain.coach`, one private Tennis application service, and
+server-authoritative SQLite with protected backup/recovery.
+
+Non-goals: co-hosting, a managed database, a load balancer, a second public listener, direct SSH deployment, or
+provisioning infrastructure in this documentation slice.
+
+Proof gate: `ENVIRONMENT.md` is the root contract; deployment routing names the exact HCloud VM/project, Caddy
+configuration, private listener, data/backup posture, and rollback target; current app tests and `git diff --check`
+pass; the change is committed and pushed to `main`.
+
 ## Next bounded change — inventory and backend seam
 
 Capability: produce a checked-in feature/persistence inventory and introduce the smallest server-authoritative

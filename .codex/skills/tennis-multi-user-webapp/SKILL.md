@@ -12,7 +12,8 @@ deployment-boundary work in this repository.
 
 Read the repository root `AGENTS.md`, `PLANS.md`, `FCIS_AUDIT.md`, and
 `plans-proposal/tennis-multi-user-webapp-implementation-plan.md`. Read the verbatim PDF extraction when checking
-whether a requirement is represented; do not treat it as runtime authority.
+whether a requirement is represented; do not treat it as runtime authority. Read `ENVIRONMENT.md` before any
+deployment or host-boundary work.
 
 ## Procedure
 
@@ -35,16 +36,20 @@ Classify the request before selecting a command:
 - **Application implementation/local acceptance:** use the Node/ESM package and focused tests. Reframe, FountainStore,
   EstatePublisher, DNS, and live servers are not prerequisites.
 - **Tennis service release/install:** first resolve the repository's admitted typed service-release boundary. The
-  current public repository has no native service-release adapter; stop at that exact seam rather than inventing SSH,
-  rsync, Caddy, GitHub Pages, a static copy, or a generic hosting script.
+  target is the dedicated HCloud/Hetzner Cloud Ubuntu environment in `ENVIRONMENT.md`: one Tennis workload behind
+  Caddy, with the application listener private. The current public repository has no native service-release adapter;
+  stop at that exact seam rather than inventing SSH, rsync, Caddy edits, GitHub Pages, a static copy, or a generic
+  hosting script.
 - **Estate landing publication:** route through the parent Fountain Coach EstatePublisher/EstateStore contract using
   `estate.publication.sync`. The `estate-landing/` directory is not a publication client.
 - **DNS/TLS or host audit:** treat it as infrastructure evidence only. Verify exact hostname, TLS identity, service
   readiness, and configured root separately from application or estate-content acceptance.
 
 For any admitted mutation, establish exact target/scope/source revision, opaque credential references, readiness and
-capacity, one active process, typed terminal receipt, remote read-back/digest, and rollback evidence. Never report
-completion from logs, silence, process existence, HTTP status, or screenshots alone.
+capacity, one active process, typed terminal receipt, remote read-back/digest, and rollback evidence. For the target
+environment, also prove HCloud VM identity, Ubuntu/Caddy readiness, private application binding, exclusive workload
+scope, SQLite storage and backup posture. Never report completion from logs, silence, process existence, HTTP status,
+or screenshots alone.
 
 ## Web acceptance
 

@@ -8,6 +8,7 @@ Scope: the public customer-facing tennis application and its implementation plan
 - `plans-proposal/tennis-multi-user-webapp-implementation-prompt.txt` is the verbatim attached specification. It is source material, not evidence that the target system already exists.
 - `plans-proposal/tennis-multi-user-webapp-implementation-plan.md` is the reviewed, executable interpretation of that specification.
 - `PLANS.md` pins the current bounded change and its proof gates.
+- `ENVIRONMENT.md` is the root environment contract for the intended HCloud-hosted service.
 - The browser must not remain authoritative for customer data after the backend migration is accepted.
 - GitHub OAuth supplies identity; application roles and authorization belong to the tennis application.
 - Public source must contain no participant data, session values, OAuth secrets, runtime state, private backups, or deployment credentials.
@@ -44,6 +45,17 @@ These rules are portable deployment discipline, not a request to turn the tennis
   be reported separately.
 - A missing native service-release adapter is a bounded blocker. Do not replace it with direct SSH mutation, rsync,
   copied binaries, ad-hoc Caddy edits, or a new generic deployment script.
+
+## Root environment
+
+The intended live host is the dedicated HCloud/Hetzner Cloud environment in [`ENVIRONMENT.md`](ENVIRONMENT.md):
+the cheapest currently eligible Ubuntu LTS VM, Caddy as the only public edge, and only the Tennis application behind
+it. The application binds privately, SQLite remains server-authoritative after migration, and no unrelated workload
+may be co-hosted. This is an environment description, not proof of provisioning.
+
+Any future service-release plan must bind the exact HCloud project/VM identity, hostname, source revision, release
+scope, Caddy configuration, application listener, storage/backup posture, and rollback target. DNS, TLS, host
+readiness, application health, and data persistence remain separate witnesses.
 
 ## Web acceptance authority
 
