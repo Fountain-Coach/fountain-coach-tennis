@@ -111,7 +111,10 @@ export async function exchangeAndVerify(name, { code, codeVerifier, state, expec
   if (!code || !codeVerifier || !nonce || !sameSecret(state, expectedState)) throw new Error('OAuth callback rejected.');
   const tokenResponse = await fetchImpl(provider.tokenEndpoint, {
     method: 'POST',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/x-www-form-urlencoded'
+    },
     body: new URLSearchParams({
       grant_type: 'authorization_code',
       code,
