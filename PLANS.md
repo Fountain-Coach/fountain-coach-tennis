@@ -198,3 +198,14 @@ customer workloads, or treating the LAN Docker deployment as production.
 
 Proof gate: exact host/domain/source receipt, Caddy/TLS witness, private listener witness, application health/read-back,
 release digest, backup/rollback evidence, bounded retention check, GitHub OAuth acceptance, and ChatGPT/MCP acceptance.
+
+## Current bounded change — first vinegarium production release (2026-09-24)
+
+Implementation result: activated the customer-facing Tennis release on the dedicated `vinegarium` host at revision
+`5ea2d97b2dfbf18325f2ec0421133870e5786359`, moved the HCloud-managed `tennis.fountain.coach` A record to
+`188.245.29.232`, obtained trusted Caddy HTTPS, and verified the public health endpoint and direct GitHub OAuth
+redirect. The release uses a private Node container, Caddy edge, persistent SQLite volume, versioned releases, and
+pre-change database snapshots.
+
+Remaining separate acceptance: complete an interactive GitHub sign-in and prove the intended ChatGPT/MCP account
+connection. That is an identity/capability witness, not a prerequisite for the public landing or health route.

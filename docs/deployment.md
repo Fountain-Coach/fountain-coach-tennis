@@ -92,9 +92,11 @@ node deploy/tennis-deploy.mjs plan --environment production
 node deploy/tennis-deploy.mjs verify
 ```
 
-Mutation remains fail-closed until the typed production release adapter has been implemented and accepted. A GitHub
-push is source publication, not a production deployment.
+Mutation remains fail-closed unless the operator supplies the exact production profile, external secrets, and `--yes`.
+A GitHub push is source publication, not a production deployment; the deployer packages the pinned clean revision and
+performs the release separately.
 
 The checked-in workflow is `.github/workflows/deploy-production.yml`. It is manually triggered, uses the protected
-`production` Environment, serializes production attempts, and requires typing `DEPLOY`. Until the release adapter is
-accepted, its final step stops with a bounded failure rather than changing the host.
+`production` Environment, serializes production attempts, and requires typing `DEPLOY`. The current verified live
+release was performed through the same checked-in CLI path with the production secrets supplied by the protected
+environment boundary.

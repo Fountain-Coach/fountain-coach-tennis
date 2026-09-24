@@ -1,6 +1,7 @@
 # Tennis root environment
 
-Status: dedicated HCloud host provisioned; application, DNS, TLS, backups, and production release remain pending.
+Status: live production release running on the dedicated HCloud host; the publishing domain is
+`https://tennis.fountain.coach/`.
 
 ## Purpose
 
@@ -67,8 +68,8 @@ The dedicated production host was provisioned on 2026-09-24 and is recorded in
   available, SSH only listening at inspection time
 - **Cost witness:** CX23 is €5.49 net / €6.5331 gross monthly before IPv4 and other optional services
 
-This proves provisioning and base-host access only. It does not prove that `tennis.fountain.coach` resolves to this
-address, that Caddy or Tennis is installed, that TLS is active, or that OAuth/MCP is connected.
+The live release witness is recorded in
+[`docs/history-first/production-release-vinegarium-20260924.md`](docs/history-first/production-release-vinegarium-20260924.md).
 
 ## Operating model: single live intranet host
 
@@ -88,6 +89,24 @@ Direct live development is governed by release housekeeping:
 
 “No staging” therefore means no duplicate production-like server, not an in-place overwrite of the running service.
 
+## Live release witness
+
+The first customer-facing release was activated on 2026-09-24 from revision `5ea2d97b2dfbf18325f2ec0421133870e5786359`.
+The release is installed under `/opt/tennis/releases/<revision>`, selected through `/opt/tennis/active`, and served by
+Caddy in front of the private Node listener. SQLite is mounted through the named production volume and the prior
+release is retained for rollback.
+
+- **DNS:** `tennis.fountain.coach A 188.245.29.232`, verified at the authoritative nameserver and public resolvers.
+- **TLS/health:** `https://tennis.fountain.coach/healthz` returned HTTP 200 with the Tennis service payload.
+- **Landing:** the public title is `Tennisrunde · Privater Zugang`.
+- **OAuth:** `/auth/login` redirects directly to GitHub with the production callback
+  `https://tennis.fountain.coach/auth/github/callback`.
+- **Release receipt:** production preparation and public read-back completed through the checked-in deployer; no secret
+  values are included in the receipt or repository.
+
+MCP remains an optional capability lane. The public release does not claim a ChatGPT account connection until that
+separate OAuth/MCP acceptance flow has been completed and evidenced.
+
 ## Release boundary
 
 This file describes the intended host, not a deployment mechanism. A GitHub push is source synchronization, not
@@ -95,9 +114,10 @@ deployment. A future live release must resolve an admitted typed HCloud service-
 hostname, VM identity, source revision, release scope, credential references, readiness/capacity checks, one active
 process, terminal receipt, health/read-back, digest, and rollback evidence.
 
-The current public repository has no such native service-release adapter. Until one is implemented and accepted, stop
-at that seam; do not substitute direct SSH, rsync, copied binaries, ad-hoc Caddy edits, GitHub Pages, or a generic
-hosting script.
+The checked-in `deploy/tennis-deploy.mjs` adapter is the admitted service-release path for this customer-facing
+repository. It uses a clean pinned archive, an external runtime environment, atomic release activation, private
+health admission, SQLite snapshotting, rollback, and public HTTPS read-back. Direct SSH or copied files outside that
+adapter remain unsupported.
 
 Estate landing publication remains separate: if `estate-landing/` is published as an estate route, use the parent
 EstatePublisher/EstateStore contract. It is not a second HCloud application deployment path.
