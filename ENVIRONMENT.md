@@ -1,6 +1,6 @@
 # Tennis root environment
 
-Status: target environment contract; live provisioning and deployment are not yet evidenced.
+Status: dedicated HCloud host provisioned; application, DNS, TLS, backups, and production release remain pending.
 
 ## Purpose
 
@@ -46,6 +46,25 @@ HCloud / Hetzner Cloud VM
   limited to the required HTTP/HTTPS edge, with administrative access kept outside the application path.
 - **Durability:** “cheapest” never means removing security, encrypted/off-host backups, integrity checks, rollback,
   or enough disk headroom for SQLite and recovery. A smaller profile is acceptable only after measured acceptance.
+
+## Provisioned host witness
+
+The dedicated production host was provisioned on 2026-09-24 and is recorded in
+[`docs/history-first/hcloud-provisioning-vinegarium-20260924.md`](docs/history-first/hcloud-provisioning-vinegarium-20260924.md).
+
+- **Server:** `vinegarium` / Hetzner server ID `167276345`
+- **Location:** Nürnberg (`nbg1`)
+- **Image:** Ubuntu 24.04
+- **Type:** `cx23`, 2 shared vCPU, 4 GB RAM, 40 GB local disk
+- **Public address:** `188.245.29.232`
+- **Firewall:** `vinegarium-edge-20260924` / ID `11673798`, ingress limited to SSH, HTTP, HTTPS, and ICMP
+- **SSH key:** `vinegarium-admin-20260924` / fingerprint `fa:94:b5:eb:da:ba:a3:c1:ab:0e:c4:46:23:76:e6:98`
+- **Host read-back:** `vinegarium`, Ubuntu 24.04, 38 GB root filesystem with 35 GB available, 3.3 GiB memory
+  available, SSH only listening at inspection time
+- **Cost witness:** CX23 is €5.49 net / €6.5331 gross monthly before IPv4 and other optional services
+
+This proves provisioning and base-host access only. It does not prove that `tennis.fountain.coach` resolves to this
+address, that Caddy or Tennis is installed, that TLS is active, or that OAuth/MCP is connected.
 
 ## Release boundary
 

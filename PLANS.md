@@ -168,3 +168,17 @@ Ubuntu/Caddy release.
 Proof gate: CLI contract tests, skill validation, privacy scan, syntax checks, and `git diff --check` pass. A live
 deployment remains a separate witness requiring an explicitly configured target, credentials, rollback evidence, and
 remote read-back.
+
+## Current bounded change — provision the dedicated HCloud root (2026-09-24)
+
+Capability: provision the lean, single-purpose Ubuntu root environment named `vinegarium` for the Tennis production
+service without claiming application deployment.
+
+Implementation result: Hetzner server `167276345` is running in Nürnberg as `cx23` (2 shared vCPU, 4 GB RAM, 40 GB
+disk) with Ubuntu 24.04, public IPv4 `188.245.29.232`, firewall `11673798`, and the admitted administrator SSH key.
+The host was read back over SSH as Ubuntu 24.04 with 35 GB root capacity available and only SSH listening.
+
+Proof: [`ENVIRONMENT.md`](ENVIRONMENT.md),
+[`docs/history-first/hcloud-provisioning-vinegarium-20260924.md`](docs/history-first/hcloud-provisioning-vinegarium-20260924.md),
+Hetzner read-back, and SSH host read-back. Remaining gates are DNS, Caddy/TLS, application release, SQLite backup
+posture, GitHub OAuth, and ChatGPT/MCP acceptance.
