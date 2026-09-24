@@ -5,7 +5,7 @@
     "domainRules": "app/src/tennis-core.js",
     "serverService": "app/integration/tennis-service.mjs",
     "serverEntrypoint": "app/mcp-server.mjs",
-    "currentPersistence": "atomic JSON file selected by TENNIS_STATE_FILE",
+    "currentPersistence": "atomic JSON file by default; normalized SQLite selected by TENNIS_STATE_BACKEND=sqlite",
     "futurePersistence": "server-authoritative SQLite"
   },
   "localStorageKeys": [
@@ -31,7 +31,6 @@
     "edit_match"
   ],
   "deferred": [
-    "sqlite-migrations",
     "durable-oauth-sessions",
     "roles-and-admin",
     "legacy-localStorage-migration",

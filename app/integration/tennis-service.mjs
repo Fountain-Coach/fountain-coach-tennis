@@ -90,8 +90,7 @@ function validateCandidate(state) {
   return errors.length ? fail('Die Änderung würde einen ungültigen Spielplan erzeugen.', errors) : { ok: true };
 }
 
-export async function applyOperation(file, operation, input = {}) {
-  const state = await loadState(file);
+export function applyStateOperation(state, operation, input = {}) {
   const next = clone(state);
   let result;
 
@@ -159,6 +158,13 @@ export async function applyOperation(file, operation, input = {}) {
     return fail(`Unbekannte Operation: ${operation}`);
   }
 
-  await saveState(file, next);
-  return { ok: true, message: 'Änderung gespeichert.', model: readModel(next) };
+  return { ok: true, message: 'Änderung gespeichert.', state: next, model: readModel(next) };
+}
+
+export async function applyOperation(file, operation, input = {}) {
+  const state = await loadState(file);
+  const result = applyStateOperation(state, operation, input);
+  if (result.ok) await saveState(file, result.state);
+  if (result.ok) delete result.state;
+  return result;
 }

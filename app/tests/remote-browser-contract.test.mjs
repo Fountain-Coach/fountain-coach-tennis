@@ -9,7 +9,7 @@ const token = 'remote-browser-contract-token';
 const directory = await mkdtemp(join(tmpdir(), 'fountain-coach-tennis-remote-'));
 const server = spawn(process.execPath, ['mcp-server.mjs'], {
   cwd: new URL('..', import.meta.url),
-  env: { ...process.env, PORT: String(port), MCP_BEARER_TOKEN: token, TENNIS_STATE_FILE: join(directory, 'state.json'), TENNIS_AUDIT_FILE: join(directory, 'audit.jsonl') },
+  env: { ...process.env, PORT: String(port), MCP_BEARER_TOKEN: token, TENNIS_STATE_BACKEND: 'sqlite', TENNIS_SQLITE_FILE: join(directory, 'tennis.sqlite'), TENNIS_STATE_FILE: join(directory, 'state.json'), TENNIS_AUDIT_FILE: join(directory, 'audit.jsonl') },
   stdio: ['ignore', 'pipe', 'pipe']
 });
 let output = '';

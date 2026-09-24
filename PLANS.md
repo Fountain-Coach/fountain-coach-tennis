@@ -59,7 +59,7 @@ tests. The JSON file adapter remains transitional; SQLite and frontend cutover a
 Proof gate: inventory review, configuration authority tests, existing API/MCP tests, syntax checks, privacy scan,
 git diff --check, semantic commit, and push to main.
 
-## Next bounded change — normalized SQLite seam
+## Current bounded change — normalized SQLite seam
 
 Capability: define and test the normalized SQLite schema and migration boundary from the checked-in feature/persistence
 inventory, without changing user-visible behavior.
@@ -68,3 +68,20 @@ Do not add guessed PDF example entities. Use only the checked-in inventory and r
 
 Proof gate: inventory review, migration/schema tests, API contract tests, unchanged frontend acceptance, privacy scan,
 semantic commit, and push to `main`.
+
+Implementation result: add a versioned normalized SQLite schema for the observed players, unavailability rules,
+schedule days, matches, configuration, and generated-at state. SQLite uses foreign keys and WAL mode, is selected by
+`TENNIS_STATE_BACKEND=sqlite`, and is exercised through the same service mutation boundary as the transitional JSON
+adapter. The default remains JSON until the frontend and operational migration are separately accepted; no PDF-only
+example entities were introduced.
+
+Proof: SQLite migration/round-trip/rejection tests pass; the authenticated remote API contract runs against SQLite;
+the existing JSON MCP contract and frontend source remain unchanged in behavior; privacy scan and diff checks pass.
+
+## Next bounded change — browser authority cutover
+
+Capability: move authenticated application reads and writes from browser localStorage to the server authority while
+preserving the current UI and retaining an explicit, auditable import path for existing local browser data.
+
+Do not delete localStorage data or claim migration success until an explicit import, duplicate/replay policy, and
+WebKit semantic acceptance are implemented.

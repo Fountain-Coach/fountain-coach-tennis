@@ -42,9 +42,9 @@ authoritative entities.
 
 | Surface | Current persistence | Current authority | Target boundary |
 | --- | --- | --- | --- |
-| Players | localStorage key fountain-tennis-players; server JSON players | Browser fallback or authenticated server API/MCP | SQLite players plus audit metadata |
-| Schedule | localStorage key fountain-tennis-schedule; server JSON schedule | Browser fallback or authenticated server API/MCP | SQLite match_days and matches |
-| Configuration | localStorage key fountain-tennis-configuration; server JSON configuration | Browser fallback or authenticated server API/MCP | SQLite season/configuration record |
+| Players | localStorage key fountain-tennis-players; server JSON or selectable SQLite players | Browser fallback or authenticated server API/MCP | SQLite `players`, `player_unavailability`, and `player_availability_rules` |
+| Schedule | localStorage key fountain-tennis-schedule; server JSON or selectable SQLite schedule | Browser fallback or authenticated server API/MCP | SQLite `schedule_days` and `matches` |
+| Configuration | localStorage key fountain-tennis-configuration; server JSON or selectable SQLite configuration | Browser fallback or authenticated server API/MCP | SQLite `tennis_configuration` record |
 | OAuth sessions/grants | Process-local maps in integration/oauth.mjs | Current process only | Durable secure session/grant records |
 | Audit events | JSONL path TENNIS_AUDIT_FILE | Server append-only file | Durable redacted audit events |
 | MCP transport sessions | Process-local map in mcp-server.mjs | Current process only | Bounded durable or explicitly ephemeral transport policy |
@@ -66,6 +66,6 @@ authoritative entities.
 ## Gaps intentionally deferred
 
 No guessed teams, clubs, seasons, or competitions are added: the current application inventory does not establish
-them. SQLite normalization, UUID migration, durable OAuth/session state, role administration, full CRUD surfaces,
-legacy localStorage migration, backup/restore, WebKit acceptance, HCloud service release, and production OAuth/MCP
-acceptance remain later bounded changes.
+them. SQLite normalization is now established for the observed domain, while UUID migration, durable OAuth/session
+state, role administration, full CRUD surfaces, legacy localStorage migration, backup/restore, WebKit acceptance,
+HCloud service release, and production OAuth/MCP acceptance remain later bounded changes.

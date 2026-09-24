@@ -13,7 +13,7 @@ Date: 2026-09-24
 
 ## Not yet established
 
-- Server-authoritative SQLite and complete backend CRUD.
+- Complete backend CRUD on top of the now-established normalized SQLite seam.
 - Durable sessions, role enforcement, admin surface, migration, backup/restore, and multi-user isolation.
 - Production deployment, live GitHub OAuth, or live ChatGPT/MCP connectivity.
 
@@ -23,7 +23,8 @@ No unestablished item is claimed as complete by this audit.
 
 - Checked-in feature/persistence inventory: present in Markdown and JSON.
 - Existing server authority now preserves and validates configuration across load, update, generate, and read-back.
-- The JSON file adapter remains transitional; SQLite authority and frontend localStorage cutover are not claimed.
+- A normalized SQLite schema/migration boundary is implemented and selectable with `TENNIS_STATE_BACKEND=sqlite`.
+- The JSON file adapter remains the default transition backend; frontend localStorage cutover is not claimed.
 
 ## Estate-derived controls now adopted
 

@@ -7,11 +7,14 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import * as z from 'zod/v4';
-import { applyOperation, emptyState, loadState, readModel } from './integration/tennis-service.mjs';
+import { emptyState, readModel } from './integration/tennis-service.mjs';
+import { createTennisAuthority } from './integration/tennis-authority.mjs';
 import { approveOAuthConsent, authorizeOAuthRequest, beginOAuth, beginOAuthConsent, completeOAuth, createLocalOAuthSession, configuredProviderName, configuredProviders, exchangeAuthorizationCode, isAdminIdentity, oauthMetadata, oauthSessionCookie, protectedResourceMetadata, readOAuthAccessToken, readOAuthSession, refreshOAuthToken, registerOAuthClient, revokeOAuthSession } from './integration/oauth.mjs';
 
 const port = Number(process.env.PORT || 8787);
 const stateFile = resolve(process.env.TENNIS_STATE_FILE || '.runtime/tennis-state.json');
+const sqliteFile = resolve(process.env.TENNIS_SQLITE_FILE || '.runtime/tennis.sqlite');
+const authority = createTennisAuthority({ stateFile, sqliteFile });
 const bearerToken = process.env.MCP_BEARER_TOKEN || '';
 const staticRoot = resolve(new URL('.', import.meta.url).pathname);
 const publicRoot = resolve(process.env.TENNIS_PUBLIC_ROOT || staticRoot);
@@ -105,13 +108,13 @@ function createServer() {
       await recordAudit(operation, false);
       return textResult({ ok: false, message: 'Diese Änderung benötigt eine ausdrückliche Nutzerbestätigung (confirm: true).' });
     }
-    const result = await applyOperation(stateFile, operation, input);
+    const result = await authority.apply(operation, input);
     await recordAudit(operation, result.ok);
     return textResult(result);
   });
 
   readTool('tennis_get_schedule', 'Liest Spielplan, Spieler, Abwesenheiten und Validierung.', async ({ date, playerId }) => {
-    const model = readModel(await loadState(stateFile));
+    const model = readModel(await authority.load());
     if (date) model.schedule = model.schedule.filter(day => day.date === date);
     if (playerId) model.schedule = model.schedule.map(day => ({ ...day, matches: day.matches.filter(match => match.a === playerId || match.b === playerId) }));
     return model;
@@ -120,11 +123,11 @@ function createServer() {
     playerId: z.string().optional().describe('Optionaler Spielerfilter')
   });
   readTool('tennis_get_players', 'Liest die aktuelle Spielerliste und Verfügbarkeiten.', async () => {
-    const model = readModel(await loadState(stateFile));
+    const model = readModel(await authority.load());
     return { players: model.players, validation: model.validation };
   });
   readTool('tennis_get_analysis', 'Liest Fairness, Spiele pro Spieler, Paarungen und Abwesenheiten.', async () => {
-    const model = readModel(await loadState(stateFile));
+    const model = readModel(await authority.load());
     return { analysis: model.analysis, absences: model.absences, validation: model.validation };
   });
   const confirmation = { confirm: z.boolean().default(false).describe('Muss nach ausdrücklicher Nutzerbestätigung true sein.') };
@@ -292,7 +295,7 @@ app.get(['/app', '/app/'], (request, response, next) => {
 app.get('/healthz', (request, response) => response.json({ ok: true, service: 'fountain-coach-tennis' }));
 app.get('/api/state', apiLimiter, async (request, response) => {
   if (!authorized(request)) return response.status(401).set('WWW-Authenticate', `Bearer resource_metadata="${publicBaseUrl(request)}/.well-known/oauth-protected-resource/mcp"`).json({ error: 'Bearer authentication required.' });
-  response.json(nativeBridgeUrl ? await nativeModel() : readModel(await loadState(stateFile)));
+  response.json(nativeBridgeUrl ? await nativeModel() : readModel(await authority.load()));
 });
 app.post('/api/operation', apiLimiter, async (request, response) => {
   if (!authorized(request, true)) return response.status(401).set('WWW-Authenticate', `Bearer resource_metadata="${publicBaseUrl(request)}/.well-known/oauth-protected-resource/mcp"`).json({ error: 'Bearer authentication required.' });
@@ -306,7 +309,7 @@ app.post('/api/operation', apiLimiter, async (request, response) => {
   }
   const result = nativeBridgeUrl
     ? { ok: true, model: readModel(JSON.parse((await callNative('fountainstore/tennis.schedule.mutate', nativeOperation[operation], input)).stateJSON || JSON.stringify(input.state || emptyState()))) }
-    : await applyOperation(stateFile, operation, input);
+    : await authority.apply(operation, input);
   await recordAudit(`api:${operation}`, result.ok);
   response.status(result.ok ? 200 : 422).json(result);
 });

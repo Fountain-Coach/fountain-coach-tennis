@@ -6,7 +6,10 @@ It contains the current tennis landing page, browser application, scheduling rul
 
 ## Current status
 
-The initial snapshot is a feature-complete single-browser/static-preview application. Browser `localStorage` remains its current persistence mode. It is not yet the completed multi-user production application.
+The initial snapshot remains a feature-complete single-browser/static-preview application. The server now has a
+normalized SQLite authority seam selected with `TENNIS_STATE_BACKEND=sqlite`, while browser `localStorage` remains
+the current frontend persistence mode until the explicit authority cutover. It is not yet the completed multi-user
+production application.
 
 The attached implementation prompt is treated as the target specification for the next phases: server-authoritative SQLite, GitHub identity, local application roles, protected `/admin`, full domain CRUD, migration/import/export, auditability, backup/restore, multi-user tests, and independently reproducible deployment. See [docs/implementation-map.md](docs/implementation-map.md).
 
