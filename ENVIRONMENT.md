@@ -8,6 +8,10 @@ Host only the customer-facing `tennis.fountain.coach` application on a minimal H
 Hetzner Cloud in this repository. The environment is intentionally single-purpose: one tennis application, one
 dedicated host, one reverse proxy, and no co-hosted customer or estate workloads.
 
+The host name `vinegarium` refers to the customer-owned business/domain identity behind the collaboration. Tennis is
+the first focused spare-time product being developed there; the publishing domain remains `tennis.fountain.coach`.
+See [`docs/product-context.md`](docs/product-context.md).
+
 ## Target topology
 
 ```

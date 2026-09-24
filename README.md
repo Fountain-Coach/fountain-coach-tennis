@@ -4,6 +4,16 @@ This public repository is the privacy-scrubbed initial customer-facing snapshot 
 
 It contains the current tennis landing page, browser application, scheduling rules, MCP/OAuth integration seam, tests, and the estate landing projection. The starter model uses generic player labels; no participant names, availability dates, runtime state, credentials, tokens, or generated private artifacts are included.
 
+## Why “Vinegarium”
+
+`vinegarium.de` is the customer-owned domain and business identity behind this work. Its owner is also one of the
+tennis players. We are developing the business together, beginning with a deliberately focused spare-time project:
+the first practical product is a tennis match and shared tennis round.
+
+That is why the dedicated HCloud host is named `vinegarium`, while the customer-facing publishing domain remains
+`tennis.fountain.coach`. The name describes the business context; Tennis is the first small, useful application we
+are building within it. This repository intentionally does not publish the owner’s personal name or participant data.
+
 ## Current status
 
 The initial snapshot remains a feature-complete single-browser/static-preview application. The server now has a
