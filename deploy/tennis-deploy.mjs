@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { tmpdir } from 'node:os';
 
 const root = resolve(new URL('..', import.meta.url).pathname);
 const args = process.argv.slice(2);
@@ -106,8 +107,41 @@ function deploy() {
     process.exitCode = 2;
     return;
   }
-  console.error('blocked: no native Tennis release adapter is configured for this target');
-  process.exitCode = 2;
+  if (git('status', '--porcelain')) {
+    console.error('blocked: source tree must be clean before release');
+    process.exitCode = 2;
+    return;
+  }
+  const revision = git('rev-parse', 'HEAD');
+  const work = mkdtempSync(resolve(tmpdir(), 'tennis-release-'));
+  const archive = resolve(work, `${revision}.tar.gz`);
+  try {
+    execFileSync('git', ['-C', root, 'archive', '--format=tar.gz', '--output', archive, revision], { stdio: 'inherit' });
+    const remoteArchive = `/tmp/tennis-release-${revision}.tar.gz`;
+    execFileSync('scp', ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', p.key,
+      archive, `${p.user}@${p.host}:${remoteArchive}`], { stdio: 'inherit' });
+    const remote = [
+      'set -eu',
+      'command -v docker >/dev/null',
+      'docker compose version >/dev/null',
+      'test ! -e "$HOME/tennis-staging/active" || true',
+      `release="$HOME/tennis-staging/releases/${revision}"`,
+      'mkdir -p "$release"',
+      `tar -xzf '${remoteArchive}' -C "$release"`,
+      'docker compose -p tennis-staging -f "$release/deploy/compose.staging.yml" up -d --build',
+      'curl --fail --silent --show-error --retry 20 --retry-delay 1 http://127.0.0.1:18080/healthz >/dev/null',
+      `printf '{"schema":"fountain-coach.tennis.deploy-receipt.v1","state":"succeeded","environment":"${environment}","revision":"${revision}","url":"http://${p.host}:18080/","health":"http://127.0.0.1:18080/healthz"}\n'`,
+      `rm -f '${remoteArchive}'`
+    ].join('; ');
+    const result = execFileSync('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', p.key,
+      `${p.user}@${p.host}`, remote], { encoding: 'utf8' });
+    console.log(result.trim());
+  } catch (error) {
+    console.error(`blocked: staging release failed: ${String(error.message || error).slice(0, 800)}`);
+    process.exitCode = 1;
+  } finally {
+    rmSync(work, { recursive: true, force: true });
+  }
 }
 
 switch (command) {
