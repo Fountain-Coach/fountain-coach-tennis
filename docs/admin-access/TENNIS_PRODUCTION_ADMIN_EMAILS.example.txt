@@ -1,0 +1,3 @@
+# Nur die verifizierte GitHub-E-Mail des zweiten Organisators eintragen.
+# Diese Kommentarzeilen nicht mitkopieren und keine Zugangsdaten ergänzen.
+dein-github-name@example.com
