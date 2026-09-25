@@ -63,6 +63,10 @@ repository. Its value is a comma-separated mapping from each verified OAuth emai
 it does not grant schedule editing, player administration, or MCP write access. Do not add a mapping until the
 corresponding player record and consent/privacy basis have been reviewed.
 
+The deployer receives this value from the protected GitHub Environment secret
+`TENNIS_PRODUCTION_PLAYER_IDENTITIES`. To grant another organizer instead, add the verified email to
+`TENNIS_PRODUCTION_ADMIN_EMAILS`; organizers receive the full shared view and editing rights.
+
 Non-secret deployment values may be stored as Environment variables, for example the exact host, deploy user,
 hostname, and public OAuth callback URI. Keep the production environment separate from staging.
 

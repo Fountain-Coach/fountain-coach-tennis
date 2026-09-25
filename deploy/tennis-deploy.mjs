@@ -171,12 +171,16 @@ function productionEnvironment() {
     TENNIS_AUDIT_FILE: '/var/lib/tennis/audit.jsonl',
     CORS_ORIGINS: 'https://tennis.fountain.coach'
   };
+  const optionalValues = {
+    TENNIS_PLAYER_IDENTITIES: process.env.TENNIS_PRODUCTION_PLAYER_IDENTITIES
+  };
   const missing = Object.entries(values).filter(([, value]) => value === undefined || value === '').map(([key]) => key);
   if (missing.length) throw new Error(`blocked: production configuration missing ${missing.join(', ')}`);
   for (const [key, value] of Object.entries(values)) {
     if (String(value).includes('\n') || String(value).includes('\r')) throw new Error(`blocked: production configuration contains a line break in ${key}`);
   }
-  return Object.entries(values).map(([key, value]) => `${key}=${value}`).join('\n') + '\n';
+  return [...Object.entries(values), ...Object.entries(optionalValues).filter(([, value]) => value !== undefined && value !== '')]
+    .map(([key, value]) => `${key}=${value}`).join('\n') + '\n';
 }
 
 function deployProduction(p, revision) {
