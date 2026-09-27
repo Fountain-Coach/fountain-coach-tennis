@@ -35,11 +35,10 @@ Classify the request before selecting a command:
 
 - **Application implementation/local acceptance:** use the Node/ESM package and focused tests. Reframe, FountainStore,
   EstatePublisher, DNS, and live servers are not prerequisites.
-- **Tennis service release/install:** first resolve the repository's admitted typed service-release boundary. The
-  target is the dedicated HCloud/Hetzner Cloud Ubuntu environment in `ENVIRONMENT.md`: one Tennis workload behind
-  Caddy, with the application listener private. The current public repository has no native service-release adapter;
-  stop at that exact seam rather than inventing SSH, rsync, Caddy edits, GitHub Pages, a static copy, or a generic
-  hosting script.
+- **Tennis service release/install:** use the checked-in `deploy/tennis-deploy.mjs` release adapter and the exact
+  HCloud/Hetzner Cloud target in `ENVIRONMENT.md`. The adapter must operate on a clean pinned revision, retain the
+  previous release, keep the application listener private, validate Caddy/application health, and return public
+  read-back evidence. Do not substitute direct SSH mutation, rsync, ad-hoc Caddy edits, GitHub Pages, or a static copy.
 - **Estate landing publication:** route through the parent Fountain Coach EstatePublisher/EstateStore contract using
   `estate.publication.sync`. The `estate-landing/` directory is not a publication client.
 - **DNS/TLS or host audit:** treat it as infrastructure evidence only. Verify exact hostname, TLS identity, service

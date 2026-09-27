@@ -51,3 +51,15 @@ The intended target is documented in [`ENVIRONMENT.md`](ENVIRONMENT.md): a dedic
 VM, Caddy-only public ingress, one private Tennis service, and server-side SQLite. The dedicated `vinegarium` host is
 now provisioned and read back. Caddy/TLS readiness, application health, persistence, backups, rollback, DNS binding,
 and production release remain unestablished until the native service-release operation proves them.
+
+## Production edge convergence — 2026-09-27
+
+Observed live topology: `tennis.fountain.coach` resolves to dedicated HCloud host `vinegarium` and is fronted by a
+Caddy container; the Tennis application is a separate private container. The prior Caddyfile reverse-proxied every
+path to the application. Parent EstatePublisher successfully promoted the Tennis estate route to the authoritative
+production FountainStore, but public verification failed on `/tennis-template-contract.json` with HTTP 404 because
+that path never reached FountainStore.
+
+The bounded correction preserves the authority split: dynamic Tennis prefixes stay on the application; estate/static
+paths proxy to `store.fountain.coach` while preserving `Host: tennis.fountain.coach`. This does not make the checked-in
+`estate-landing/` directory a publication authority.

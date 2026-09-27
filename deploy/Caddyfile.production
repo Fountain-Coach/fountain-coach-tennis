@@ -1,4 +1,14 @@
 tennis.fountain.coach {
   encode gzip
-  reverse_proxy tennis-app:8787
+
+  @dynamic path /app* /auth* /oauth* /api* /mcp* /.well-known* /healthz
+  handle @dynamic {
+    reverse_proxy tennis-app:8787
+  }
+
+  handle {
+    reverse_proxy https://store.fountain.coach {
+      header_up Host tennis.fountain.coach
+    }
+  }
 }

@@ -43,8 +43,10 @@ These rules are portable deployment discipline, not a request to turn the tennis
 - Silence, stdout, process existence, elapsed time, HTTP 200, or a screenshot alone is never completion evidence.
 - DNS, TLS identity, service readiness, application acceptance, and estate publication are distinct witnesses and must
   be reported separately.
-- A missing native service-release adapter is a bounded blocker. Do not replace it with direct SSH mutation, rsync,
-  copied binaries, ad-hoc Caddy edits, or a new generic deployment script.
+- The checked-in `deploy/tennis-deploy.mjs` is the admitted versioned Tennis service-release adapter for the dedicated
+  HCloud host. It owns clean revision selection, immutable release packaging, atomic activation, health/read-back,
+  rollback, and the public edge configuration. Direct SSH mutation, rsync, copied binaries, and ad-hoc Caddy edits
+  remain unsupported.
 
 ## Root environment
 

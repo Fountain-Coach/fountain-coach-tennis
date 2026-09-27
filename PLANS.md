@@ -285,3 +285,23 @@ checked into Git or added to production by this slice.
 Proof: portable migration browser-source assertion, existing import authority tests, full application tests, MCP and
 remote authority contracts, syntax checks, privacy/diff checks. The operator must still review the file and confirm the
 replacement; player identity mapping remains separate.
+
+## Current bounded change — converge Tennis public edge with estate authority (2026-09-27)
+
+Capability: keep the dedicated Tennis application runtime on `vinegarium` while restoring the parent estate's
+published static surface for `tennis.fountain.coach`.
+
+Observed failure: the Chapter 152 production Store promotion succeeded for all nine estate hosts, but public E2E failed
+because the production Caddy edge proxied every Tennis path to the Node application. The admitted estate file
+`/tennis-template-contract.json` was therefore 404 publicly even though the authoritative production FountainStore
+served the exact expected 527-byte file and digest when addressed directly.
+
+Implementation: production Caddy now admits only the dynamic Tennis prefixes `/app*`, `/auth*`, `/oauth*`,
+`/api*`, `/mcp*`, `/.well-known*`, and `/healthz` to `tennis-app:8787`. All other paths proxy to
+`https://store.fountain.coach` with `Host: tennis.fountain.coach`, preserving EstatePublisher/FountainStore as the
+estate/static authority. No `estate-landing/` directory copy becomes a publication path.
+
+Proof gate: Caddy 2.10 validates the split config; the deployment-routing contract test passes; full application tests,
+syntax checks, privacy scan, and `git diff --check` pass; the semantic commit is pushed to `main`; production deploy
+runs only through `deploy/tennis-deploy.mjs`; public dynamic health and estate static digest both read back; the parent
+Fountain Host production continuation is retried and must reach terminal `production-served-e2e` with zero failures.
