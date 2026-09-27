@@ -27,10 +27,20 @@ function profile() {
   return { environment, host, user, key, hostname };
 }
 
+function materializeSSHIdentity(key, directory) {
+  if (!key || (!key.includes('\n') && !key.includes('PRIVATE KEY'))) return key;
+  const path = resolve(directory, 'deploy-identity');
+  writeFileSync(path, key.endsWith('\n') ? key : `${key}\n`, { mode: 0o600 });
+  chmodSync(path, 0o600);
+  return path;
+}
+
 function remoteInspection(p) {
   if (!p.host || !p.user || !p.key) return { state: 'not-configured' };
+  const work = mkdtempSync(resolve(tmpdir(), 'tennis-inspect-'));
+  const sshKey = materializeSSHIdentity(p.key, work);
   try {
-    const output = execFileSync('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', '-i', p.key,
+    const output = execFileSync('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', '-i', sshKey,
       `${p.user}@${p.host}`, 'set -eu; printf "host=%s\\n" "$(hostname)"; printf "kernel=%s\\n" "$(uname -srm)"; printf "node=%s\\n" "$(command -v node || true)"; printf "caddy=%s\\n" "$(command -v caddy || true)"; printf "listeners=%s\\n" "$(ss -ltnH 2>/dev/null | awk \'{print $4}\' | sort -u | tr "\\n" ",")"; printf "root=%s\\n" "$(df -P / | tail -1)"'], { encoding: 'utf8' }).trim().split('\n');
     const fields = Object.fromEntries(output.map((line) => { const separator = line.indexOf('='); return [line.slice(0, separator), line.slice(separator + 1)]; }));
     return {
@@ -44,6 +54,8 @@ function remoteInspection(p) {
     };
   } catch (error) {
     return { state: 'blocked', detail: String(error.message || error).replace(/(identity|secret|token|password|key)[^\n]*/gi, '$1=REDACTED').slice(0, 500) };
+  } finally {
+    rmSync(work, { recursive: true, force: true });
   }
 }
 
@@ -121,10 +133,11 @@ function deploy() {
 function deployStaging(p, revision) {
   const work = mkdtempSync(resolve(tmpdir(), 'tennis-release-'));
   const archive = resolve(work, `${revision}.tar.gz`);
+  const sshKey = materializeSSHIdentity(p.key, work);
   try {
     execFileSync('git', ['-C', root, 'archive', '--format=tar.gz', '--output', archive, revision], { stdio: 'inherit' });
     const remoteArchive = `/tmp/tennis-release-${revision}.tar.gz`;
-    execFileSync('scp', ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', p.key,
+    execFileSync('scp', ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', sshKey,
       archive, `${p.user}@${p.host}:${remoteArchive}`], { stdio: 'inherit' });
     const remote = [
       'set -eu',
@@ -139,7 +152,7 @@ function deployStaging(p, revision) {
       `printf '{"schema":"fountain-coach.tennis.deploy-receipt.v1","state":"succeeded","environment":"${environment}","revision":"${revision}","url":"http://${p.host}:18080/","health":"http://127.0.0.1:18080/healthz"}\n'`,
       `rm -f '${remoteArchive}'`
     ].join('; ');
-    const result = execFileSync('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', p.key,
+    const result = execFileSync('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', sshKey,
       `${p.user}@${p.host}`, remote], { encoding: 'utf8' });
     console.log(result.trim());
   } catch (error) {
@@ -187,6 +200,7 @@ function deployProduction(p, revision) {
   const work = mkdtempSync(resolve(tmpdir(), 'tennis-production-release-'));
   const archive = resolve(work, `${revision}.tar.gz`);
   const envFile = resolve(work, 'tennis.env');
+  const sshKey = materializeSSHIdentity(p.key, work);
   try {
     const productionEnv = productionEnvironment();
     writeFileSync(envFile, productionEnv, { mode: 0o600 });
@@ -194,9 +208,9 @@ function deployProduction(p, revision) {
     execFileSync('git', ['-C', root, 'archive', '--format=tar.gz', '--output', archive, revision], { stdio: 'inherit' });
     const remoteArchive = `/tmp/tennis-production-release-${revision}.tar.gz`;
     const remoteEnv = `/tmp/tennis-production-env-${revision}`;
-    execFileSync('scp', ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', p.key,
+    execFileSync('scp', ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', sshKey,
       archive, `${p.user}@${p.host}:${remoteArchive}`], { stdio: 'inherit' });
-    execFileSync('scp', ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', p.key,
+    execFileSync('scp', ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', sshKey,
       envFile, `${p.user}@${p.host}:${remoteEnv}`], { stdio: 'inherit' });
     const releaseRoot = '/opt/tennis';
     const remote = [
@@ -220,7 +234,7 @@ function deployProduction(p, revision) {
       `printf '{"schema":"fountain-coach.tennis.deploy-receipt.v2","state":"${skipPublicCheck ? 'prepared' : 'succeeded'}","environment":"production","revision":"${revision}","host":"${p.host}","hostname":"${p.hostname}","url":"https://${p.hostname}/","health":"https://${p.hostname}/healthz","publicReadback":"${skipPublicCheck ? 'skipped' : 'verified'}","release":"%s","rollback":"%s"}\n' "$release" "\${previous:-none}"`,
       `rm -f ${shellQuote(remoteArchive)} ${shellQuote(remoteEnv)}`
     ].join('; ');
-    const result = execFileSync('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', p.key,
+    const result = execFileSync('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-i', sshKey,
       `${p.user}@${p.host}`, remote], { encoding: 'utf8' });
     console.log(result.trim());
   } catch (error) {
